@@ -4,13 +4,13 @@ This compendium archives my journey through mathematics, with a particular focus
 
 ### Jane Street Problems
 
-- [**Problem 001 - Pyrknot's Planetary Parade**](Jane%20Street%20Problems/Problem%20001.md)
+- [**Problem 001 - Pyrknot's Planetary Parade**](JaneStreet/001.md)
 
 ### Math Concepts
 
-- [**The Integral**](Math%20Concept%20Lexicon.md#the-integral---)
-- [**Angular Separation**](Math%20Concept%20Lexicon.md#angular-separation---)
-- [**Great Circle**](Math%20Concept%20Lexicon.md#great-circle)
-- [**Antipodal Point**](Math%20Concept%20Lexicon.md#antipodal-point)
-- [**Binomial Coefficient**](Math%20Concept%20Lexicon.md#binomial-coefficient---)
-- [**Geometric Probability**](Math%20Concept%20Lexicon.md#geometric-probability)
+- [**The Integral**](MathLexicon.md#the-integral---)
+- [**Angular Separation**](MathLexicon.md#angular-separation---)
+- [**Great Circle**](MathLexicon.md#great-circle)
+- [**Antipodal Point**](MathLexicon.md#antipodal-point)
+- [**Binomial Coefficient**](MathLexicon.md#binomial-coefficient---)
+- [**Geometric Probability**](MathLexicon.md#geometric-probability)
