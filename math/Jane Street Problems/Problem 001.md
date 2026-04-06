@@ -1,0 +1,107 @@
+
+
+## Pyrknot's Planetary Parade
+**Source:** Jane Street Monthly Puzzle, March 2025
+**Date solved:** March 29, 2026
+**Topics:** Geometric probability, Spherical geometry, Integration, Combinatorics
+
+---
+
+### The Problem
+
+A planet Pyrknot (perfect sphere, radius R) has 6 other planets in its system. Each night these planets appear at **independently and uniformly random positions** in the sky. If at a given moment there exists somewhere on Pyrknot that all six planets are visible, an observer at a random position has probability **α** of also seeing all six.
+
+A tower is built allowing visibility of anything seen from any surface point within distance **r** of its base. In the limit of small r/R, the new probability is linearly approximated by:
+
+$$P = \alpha + \beta \cdot \frac{r}{R}$$
+
+**Find α and β in exact terms.**
+
+---
+
+### Key Insight Chain
+
+**Step 1 — Visibility fraction**
+From any point on a sphere's surface, you can see exactly **1/2 of the celestial sphere** — the hemisphere above your horizon.
+
+**Step 2 — Great circles**
+Each planet defines a **great circle** on Pyrknot's surface: the boundary between positions that can see it and positions that cannot. A great circle is any circle formed by slicing a sphere through its center.
+
+**Step 3 — Counting regions**
+*n* great circles in general position divide a sphere into $n^2 - n + 2$ regions.
+
+| Planets (n) | Regions | Winning regions | α |
+|---|---|---|---|
+| 1 | 2 | 1 | 1/2 |
+| 2 | 4 | 2 | 1/2 |
+| 3 | 8 | 2 | 1/4 |
+| 4 | 14 | 2 | 1/7 |
+| 6 | 32 | 2 | 1/16 |
+
+**Step 4 — Antipodal symmetry**
+The number of winning regions is always **2**, not 1. You and the observer at your exact antipodal point (opposite side of Pyrknot) always see the identical set of planets. Winning regions come in antipodal pairs.
+
+**Step 5 — α**
+$$\alpha = \frac{2}{n^2 - n + 2} = \frac{2}{36 - 6 + 2} = \frac{2}{32} = \boxed{\frac{1}{16}}$$
+
+---
+
+### Finding β — The Tower
+
+**The strip argument:**
+A surface point at distance r from the tower base has a horizon rotated by angle:
+$$\phi = \frac{r}{R} \quad \text{(radians, small angle approximation)}$$
+
+The tower adds a thin strip of angular width φ around your horizon great circle. This strip covers fraction **φ = r/R** of the full celestial sphere.
+
+**When does the tower actually help?**
+Only when exactly 5 planets are already in your hemisphere and 1 planet sits in the newly visible strip. That's the only scenario where the tower flips your result from failure to success.
+
+**Probability of this:**
+$$\beta = \binom{6}{1} \times \frac{1}{2^5} = 6 \times \frac{1}{32} = \boxed{\frac{3}{16}}$$
+
+The binomial coefficient $\binom{6}{1} = 6$ counts which of the 6 planets is the "strip planet."
+
+---
+
+### Final Answer
+
+$$\boxed{\alpha = \frac{1}{16}, \quad \beta = \frac{3}{16}}$$
+
+$$P(\text{tower}) = \frac{1}{16} + \frac{3}{16} \cdot \frac{r}{R}$$
+
+---
+
+## Concepts Introduced
+
+### The Integral — ∫
+The integral is a **continuous sigma**. Where Σ sums over discrete integers, ∫ sums over real numbers with infinitely small steps.
+
+$$\sum_{i=1}^{n} f(i) \longrightarrow \int_a^b f(x)\, dx$$
+
+The $dx$ is the infinitely thin step size. The ∫ symbol is a stretched **S** for Sum.
+
+**Two basic rules:**
+- $\int_a^b c\, dx = c(b-a)$ — rectangle, height × width
+- $\int_a^b x\, dx = \dfrac{b^2 - a^2}{2}$ — triangle area
+
+### Angular Separation — θ
+The single number that fully describes the geometric relationship between two points on a sphere. The angle between their direction vectors from the center. Ranges from 0° (same point) to 180° (antipodal).
+
+### Great Circle
+Any circle formed by slicing a sphere through its center. The largest possible circle on a sphere. The equator and lines of longitude are great circles. Any two points on a sphere define a unique great circle.
+
+### Antipodal Point
+The point exactly opposite you on a sphere. If you're at position **p**, your antipodal point is **−p**. You and your antipodal point always see the same hemisphere of the celestial sphere.
+
+### Binomial Coefficient — $\binom{n}{k}$
+Read as **"n choose k"**. The number of ways to select k items from n items.
+$$\binom{n}{k} = \frac{n!}{k!(n-k)!}$$
+$$\binom{6}{1} = 6, \quad \binom{6}{2} = 15, \quad \binom{6}{3} = 20$$
+
+### Geometric Probability
+When outcomes are continuous (points on a sphere, lengths, areas) rather than discrete, probability = **favorable area / total area**. You integrate instead of count.
+
+---
+
+*Math Compendium — started March 29, 2026*

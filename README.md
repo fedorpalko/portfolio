@@ -1,15 +1,11 @@
 👋 Hi, welcome to my personal portfolio / encyclopedia of all my work and projects related to pursuing a career in quantitative research and development.
 
-### TOC
+## Table of Contents
 
-**Code Projects**\
-**Trading Experience**\
-**IMC Prosperity Results**\
-**Problem Solving**\
-**About Me**
+- [**Code Projects**](code/PROJECTS.md)
+- [**Math Compendium**](math/COMPENDIUM.md)
+- [**IMC Prosperity**](imc_prosperity/README.md)
+- [**Crypto Trading**](crypto_trading/README.md)
 
-# Code Projects
-
-[**Quantlab**](code/quantlab/README.md), an open-source backtesting engine built using Python and controllable via a web interface. If you wish to browse the source code, you are allowed to do so.
 
 
