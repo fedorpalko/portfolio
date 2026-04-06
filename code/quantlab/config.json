@@ -1,0 +1,11 @@
+{
+    "enable_optimization": false,
+    "epochs": 100,
+    "metric": "max_drawdown",
+    "ticker": "GOOG",
+    "start_date": "2022-10-01",
+    "end_date": "2025-10-01",
+    "period": "1d",
+    "initial_capital": 10000.0,
+    "fees_per_trade": 1.0
+}

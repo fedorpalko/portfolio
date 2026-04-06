@@ -1,0 +1,9 @@
+[theme]
+primaryColor="#0080FF"           # Accent blue
+backgroundColor="#2c2c2c"        # Main dark grey
+secondaryBackgroundColor="#3a3a3a" # Lighter dark grey for secondary elements
+textColor="#ffffff"              # White text
+font="sans serif"
+
+[server]
+enableCORS = false # Disable CORS for local development - this will not be used in deployment
