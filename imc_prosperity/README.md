@@ -1,2 +1,0 @@
-# IMC Prosperity 4
-

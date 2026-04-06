@@ -1,6 +1,11 @@
+---
+layout: default
+title: Quantlab
+---
+
 # Quantlab
 
-![Logo](.res/quantlab.png)
+![Logo](res/quantlab.png)
 
 **Current Version: QL4**\
 Quantlab is an open-source backtesting engine. It's part of a series of projects designed to help me get a job in the quantitative analysis industry.
@@ -25,5 +30,5 @@ Create a virtual environment with `python -m venv venv`, then run `source venv/b
 
 ### Showcase
 
-![Dashboard Top](.res/example_top.png)
-![Dashboard Bottm](.res/examplebottoms.png)
+![Dashboard Top](res/example_top.png)
+![Dashboard Bottm](res/examplebottoms.png)

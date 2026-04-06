@@ -1,3 +1,8 @@
+---
+layout: default
+title: Math Lexicon
+---
+
 ### The Integral — ∫
 The integral is a **continuous sigma**. Where Σ sums over discrete integers, ∫ sums over real numbers with infinitely small steps - so in ∫ notation, $a$ is the start point and $b$ is the end point.
 
