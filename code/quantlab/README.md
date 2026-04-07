@@ -1,8 +1,3 @@
----
-layout: default
-title: Quantlab
----
-
 # Quantlab
 
 ![Logo](res/quantlab.png)

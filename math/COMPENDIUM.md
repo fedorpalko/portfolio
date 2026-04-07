@@ -1,8 +1,3 @@
----
-layout: default
-title: Math Compendium
----
-
 # The Math Compendium
 
 This compendium archives my journey through mathematics, with a particular focus on probability theory and stochastic processes, as well as my solutions to various math problems from sources like Jane Street. It was originally a local Obsidian vault, but I've incorporated it into the portfolio.
