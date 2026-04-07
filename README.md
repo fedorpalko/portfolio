@@ -7,5 +7,9 @@
 - [**IMC Prosperity**](imc_prosperity/index.md)
 - [**Crypto Trading**](crypto_trading/index.md)
 
+<script type="text/javascript" async
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>+
+
 
 
