@@ -1,20 +1,3 @@
-"""
-emerald.py — Emeralds Market-Making Strategy
-IMC Prosperity 4 — Tutorial Round
-
-Strategy rationale:
-  Emeralds are a stationary mean-reverting asset pinned at 10,000.
-  Observed spread is consistently ~16 (bid ~9992, ask ~10008).
-  We exploit this with a tight market-making strategy:
-    - Post bids slightly above best bid when we're not max-long
-    - Post asks slightly below best ask when we're not max-short
-    - Aggressively take any quote that crosses our fair value by > threshold
-  Position limit: 80 (per backtester data.py)
-
-Fair value = 10,000 (hard-coded; data confirms it never deviates more than ±4).
-We shade our quotes based on current inventory to avoid leaning too hard.
-"""
-
 from datamodel import OrderDepth, TradingState, Order
 from typing import List, Dict
 
@@ -22,18 +5,14 @@ PRODUCT = "EMERALDS"
 POSITION_LIMIT = 80
 FAIR_VALUE = 10_000
 
-# How many ticks inside the market we post (competitive but not crossing)
-MAKE_EDGE = 1
-# Minimum edge we require to hit an existing quote (take liquidity)
-TAKE_THRESHOLD = 2
-# Inventory skew: reduce quote size by 1 for every SKEW_UNIT units of position
-SKEW_UNIT = 10
-# Base order size
-BASE_SIZE = 10
+# One tick inside the bots for queue priority
+BID_PRICE = 9_993
+ASK_PRICE = 10_007
 
+# If position gets too extreme, rebalance by taking bot liquidity
+REBALANCE_THRESHOLD = 50  # if |pos| > this, start taking the other side
 
-def get_position(state: TradingState, product: str) -> int:
-    return state.position.get(product, 0)
+BASE_SIZE = 30
 
 
 def emerald_orders(state: TradingState) -> List[Order]:
@@ -43,58 +22,53 @@ def emerald_orders(state: TradingState) -> List[Order]:
         return orders
 
     od: OrderDepth = state.order_depths[PRODUCT]
-    pos = get_position(state, PRODUCT)
+    pos = state.position.get(PRODUCT, 0)
 
-    # ── 1. TAKE liquidity if someone is pricing badly ──────────────────────
-    # If best ask is below fair - threshold → buy it
-    if od.sell_orders:
-        best_ask = min(od.sell_orders.keys())
-        best_ask_vol = -od.sell_orders[best_ask]  # sell_orders have negative volumes in Prosperity
-        if best_ask < FAIR_VALUE - TAKE_THRESHOLD:
-            buy_qty = min(best_ask_vol, POSITION_LIMIT - pos)
-            if buy_qty > 0:
-                orders.append(Order(PRODUCT, best_ask, buy_qty))
-                pos += buy_qty  # update shadow position
+    # ── 1. TAKE bot quotes to rebalance if position is extreme ────────────
+    # If we're very long, hit the bot ask isn't useful — sell into bots' bid
+    if pos > REBALANCE_THRESHOLD and od.buy_orders:
+        best_bid = max(od.buy_orders.keys())  # bot bid at 9992
+        qty = min(od.buy_orders[best_bid], pos - REBALANCE_THRESHOLD // 2)
+        if qty > 0:
+            orders.append(Order(PRODUCT, best_bid, -qty))
+            pos -= qty
 
-    if od.buy_orders:
-        best_bid = max(od.buy_orders.keys())
-        best_bid_vol = od.buy_orders[best_bid]
-        if best_bid > FAIR_VALUE + TAKE_THRESHOLD:
-            sell_qty = min(best_bid_vol, POSITION_LIMIT + pos)
-            if sell_qty > 0:
-                orders.append(Order(PRODUCT, best_bid, -sell_qty))
-                pos -= sell_qty
+    elif pos < -REBALANCE_THRESHOLD and od.sell_orders:
+        best_ask = min(od.sell_orders.keys())  # bot ask at 10008
+        qty = min(-od.sell_orders[best_ask], -REBALANCE_THRESHOLD // 2 - pos)
+        if qty > 0:
+            orders.append(Order(PRODUCT, best_ask, qty))
+            pos += qty
 
-    # ── 2. MAKE quotes around fair value ──────────────────────────────────
-    # Inventory skew: if we're long, drop bid size and tighten bid price;
-    # if we're short, drop ask size and tighten ask price.
-    skew = pos / POSITION_LIMIT  # ranges -1 to +1
+    # ── 2. MAKE quotes one tick inside the bots ───────────────────────────
+    # Inventory skew: compress quotes toward fair value as position grows
+    # so we're more eager to unwind and less eager to grow the position
+    skew = pos / POSITION_LIMIT  # -1 to +1
 
-    # Quote prices
-    our_bid = FAIR_VALUE - MAKE_EDGE
-    our_ask = FAIR_VALUE + MAKE_EDGE
+    # Shift both sides by skew so the book leans toward unwind
+    bid_shift = round(skew * 3)
+    ask_shift = round(skew * 3)
 
-    # Quote sizes (inventory-adjusted, ensure we don't breach limits)
+    our_bid = BID_PRICE - bid_shift
+    our_ask = ASK_PRICE - ask_shift
+
     bid_room = POSITION_LIMIT - pos
     ask_room = POSITION_LIMIT + pos
 
-    # Reduce size when skewed to avoid doubling down
-    bid_size = max(1, int(BASE_SIZE * (1 - max(skew, 0))))
-    ask_size = max(1, int(BASE_SIZE * (1 + min(skew, 0))))
+    bid_qty = min(BASE_SIZE, bid_room)
+    ask_qty = min(BASE_SIZE, ask_room)
 
-    bid_qty = min(bid_size, bid_room)
-    ask_qty = min(ask_size, ask_room)
-
-    if bid_qty > 0:
+    # Safety: never post a bid above or ask below fair value
+    if our_bid < FAIR_VALUE and bid_qty > 0:
         orders.append(Order(PRODUCT, our_bid, bid_qty))
-    if ask_qty > 0:
+    if our_ask > FAIR_VALUE and ask_qty > 0:
         orders.append(Order(PRODUCT, our_ask, -ask_qty))
 
     return orders
 
 
 class Trader:
-    def run(self, state: TradingState) -> Dict[str, List[Order]]:
+    def run(self, state: TradingState) -> tuple:
         result: Dict[str, List[Order]] = {}
         result[PRODUCT] = emerald_orders(state)
-        return result
+        return result, 0, ""
