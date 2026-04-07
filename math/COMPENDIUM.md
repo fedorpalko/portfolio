@@ -14,3 +14,4 @@ This compendium archives my journey through mathematics, with a particular focus
 - [**Antipodal Point**](MathLexicon.html#antipodal-point)
 - [**Binomial Coefficient**](MathLexicon.html#binomial-coefficient---)
 - [**Geometric Probability**](MathLexicon.html#geometric-probability)
+- [**Euler Characteristic**](MathLexicon.html#euler-characteristic)

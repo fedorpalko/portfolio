@@ -25,3 +25,8 @@ $$\binom{6}{1} = 6, \quad \binom{6}{2} = 15, \quad \binom{6}{3} = 20$$
 
 ### Geometric Probability
 When outcomes are continuous (points on a sphere, lengths, areas) rather than discrete, probability = **favorable area / total area**. You integrate instead of count.
+
+### Euler Characteristic
+For any convex polyhedron or subdivision of a sphere's surface into vertices, edges, and faces:
+$$V - E + F = 2$$
+A powerful tool for counting regions when a simple formula isn't available. Used here to count the 44 regions carved out by 7 great circles.
