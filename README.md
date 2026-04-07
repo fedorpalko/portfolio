@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+
 👋 Hi, welcome to my personal portfolio / encyclopedia of all my work and projects related to pursuing a career in quantitative research and development.
 
 ## Table of Contents
