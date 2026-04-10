@@ -30,3 +30,15 @@ When outcomes are continuous (points on a sphere, lengths, areas) rather than di
 For any convex polyhedron or subdivision of a sphere's surface into vertices, edges, and faces:
 $$V - E + F = 2$$
 A powerful tool for counting regions when a simple formula isn't available. Used here to count the 44 regions carved out by 7 great circles.
+
+### Kelly Criterion
+
+A formula for risk allocation with the sizing a sequence of bets by maximizing the long-term expected value of the logarithm of wealth. It assumes various forms depending on the use case, for instance gambling:
+
+$\boxed{f^* = \frac{bp - q}{b}}$
+
+Where:
+- $f^*$ is the optimal fraction of capital to bet
+- $b$ is the net odds received on the wager (e.g., if you bet $1 and win $3, $b = 3$)
+- $p$ is the probability of winning
+- $q$ is the probability of losing ($q = 1 - p$)

@@ -5,5 +5,5 @@ It includes strategy design theorems and theses, practical implementation via th
 
 ### Strategies
 
-- [Keltner Channel Breakout](strats/KC_Breakout.md)
+- [Strategy 001](strats/001.md)
 
