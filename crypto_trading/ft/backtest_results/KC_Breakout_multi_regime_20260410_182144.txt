@@ -1,0 +1,485 @@
+=================================================================
+
+  KC_Breakout — Multi-Regime Backtest Pipeline
+  Strategy  : KC_Breakout
+  Timeframe : 4h
+  Regimes   : 5
+  Run at    : Fri Apr 10 06:21:44 PM CEST 2026
+
+=================================================================
+
+=================================================================
+
+  REGIME 1/5 — BULL_RUN
+  Bull Run 2020-2021 — BTC 8k to 69k, parabolic institutional rally
+  Timerange : 20200101-20211130
+
+=================================================================
+[18:21:44] Downloading data for BULL_RUN (20200101-20211130)...
+-----------------------------------------------------------------
+time="2026-04-10T18:21:49+02:00" level=warning msg="Found orphan containers ([ft-freqtrade-run-66529e033ab4]) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+ Container ft-freqtrade-run-d90fce2aff48 Creating 
+ Container ft-freqtrade-run-d90fce2aff48 Created 
+2026-04-10 16:21:52,639 - freqtrade - INFO - freqtrade docker-2026.4-dev-ed6899aa
+2026-04-10 16:21:56,683 - numexpr.utils - INFO - NumExpr defaulting to 12 threads.
+2026-04-10 16:22:08,242 - freqtrade.configuration.load_config - INFO - Using config: user_data/config.json ...
+2026-04-10 16:22:08,244 - freqtrade.loggers - INFO - Enabling colorized output.
+2026-04-10 16:22:08,244 - freqtrade.loggers - INFO - Logfile configured
+2026-04-10 16:22:08,244 - freqtrade.loggers - INFO - Verbosity set to 0
+2026-04-10 16:22:08,245 - freqtrade.configuration.configuration - INFO - Parameter --timerange detected: 20200101-20211130 ...
+2026-04-10 16:22:08,415 - freqtrade.configuration.configuration - INFO - Using user-data directory: /freqtrade/user_data ...
+2026-04-10 16:22:08,416 - freqtrade.configuration.configuration - INFO - Using data directory: /freqtrade/user_data/data/binance ...
+2026-04-10 16:22:08,416 - freqtrade.configuration.configuration - INFO - Erase detected. Deleting existing data.
+2026-04-10 16:22:08,416 - freqtrade.configuration.configuration - INFO - timeframes --timeframes: ['4h']
+2026-04-10 16:22:08,417 - freqtrade.configuration.configuration - INFO - Filter trades by timerange: 20200101-20211130
+2026-04-10 16:22:08,418 - freqtrade.exchange.check_exchange - INFO - Checking exchange...
+2026-04-10 16:22:08,427 - freqtrade.exchange.check_exchange - INFO - Exchange "binance" is officially supported by the Freqtrade development team.
+2026-04-10 16:22:08,427 - freqtrade.configuration.configuration - INFO - Using pairlist from configuration.
+2026-04-10 16:22:08,428 - freqtrade.configuration.config_validation - INFO - Validating configuration ...
+2026-04-10 16:22:09,047 - freqtrade.exchange.exchange - INFO - Instance is running with dry_run enabled
+2026-04-10 16:22:09,047 - freqtrade.exchange.exchange - INFO - Using CCXT 4.5.46
+2026-04-10 16:22:09,048 - freqtrade.exchange.exchange - INFO - Applying additional ccxt config: {'options': {'defaultType': 'swap'}}
+2026-04-10 16:22:09,054 - freqtrade.exchange.exchange - INFO - Applying additional ccxt config: {'options': {'defaultType': 'swap'}}
+2026-04-10 16:22:09,061 - freqtrade.exchange.exchange - INFO - Using Exchange "Binance"
+2026-04-10 16:22:09,062 - freqtrade.resolvers.exchange_resolver - INFO - Using resolved exchange 'Binance'...
+2026-04-10 16:22:09,063 - freqtrade.exchange.exchange - INFO - Markets were not loaded. Loading them now..
+2026-04-10 16:22:11,028 - freqtrade.data.history.history_utils - INFO - About to download pairs: ['BTC/USDT:USDT', 'ETH/USDT:USDT', 'BNB/USDT:USDT', 'XRP/USDT:USDT', 'SOL/USDT:USDT', 'ADA/USDT:USDT', 
+'DOGE/USDT:USDT', 'TRX/USDT:USDT', 'DOT/USDT:USDT', 'LINK/USDT:USDT', 'AVAX/USDT:USDT', 'ETC/USDT:USDT', 'LTC/USDT:USDT', 'XLM/USDT:USDT', 'ATOM/USDT:USDT', 'NEAR/USDT:USDT', 'APT/USDT:USDT', 
+'OP/USDT:USDT', 'ARB/USDT:USDT'], intervals: ['4h'] to /freqtrade/user_data/data/binance
+2026-04-10 16:22:11,236 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair BTC/USDT:USDT, 4h, futures.
+2026-04-10 16:22:11,238 - freqtrade.data.history.history_utils - INFO - Download history data for "BTC/USDT:USDT", 4h, futures and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00 
+to 2021-11-30T00:00:00
+2026-04-10 16:22:12,810 - freqtrade.data.history.history_utils - INFO - Downloaded data for BTC/USDT:USDT, 4h, futures with length 4490.
+2026-04-10 16:22:12,828 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair BTC/USDT:USDT, 1h, mark.
+2026-04-10 16:22:12,829 - freqtrade.data.history.history_utils - INFO - Download history data for "BTC/USDT:USDT", 1h, mark and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00 to 
+2021-11-30T00:00:00
+2026-04-10 16:22:16,932 - freqtrade.data.history.history_utils - INFO - Downloaded data for BTC/USDT:USDT, 1h, mark with length 16965.
+2026-04-10 16:22:16,938 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair BTC/USDT:USDT, 1h, funding_rate.
+2026-04-10 16:22:16,939 - freqtrade.data.history.history_utils - INFO - Download history data for "BTC/USDT:USDT", 1h, funding_rate and store in /freqtrade/user_data/data/binance. From 
+2020-01-01T00:00:00 to 2021-11-30T00:00:00
+2026-04-10 16:22:18,157 - freqtrade.data.history.history_utils - INFO - Downloaded data for BTC/USDT:USDT, 1h, funding_rate with length 3000.
+2026-04-10 16:22:18,161 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair ETH/USDT:USDT, 4h, futures.
+2026-04-10 16:22:18,162 - freqtrade.data.history.history_utils - INFO - Download history data for "ETH/USDT:USDT", 4h, futures and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00 
+to 2021-11-30T00:00:00
+2026-04-10 16:22:19,764 - freqtrade.data.history.history_utils - INFO - Downloaded data for ETH/USDT:USDT, 4h, futures with length 4490.
+2026-04-10 16:22:19,778 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair ETH/USDT:USDT, 1h, mark.
+2026-04-10 16:22:19,779 - freqtrade.data.history.history_utils - INFO - Download history data for "ETH/USDT:USDT", 1h, mark and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00 to 
+2021-11-30T00:00:00
+2026-04-10 16:22:23,876 - freqtrade.data.history.history_utils - INFO - Downloaded data for ETH/USDT:USDT, 1h, mark with length 16965.
+2026-04-10 16:22:23,883 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair ETH/USDT:USDT, 1h, funding_rate.
+2026-04-10 16:22:23,884 - freqtrade.data.history.history_utils - INFO - Download history data for "ETH/USDT:USDT", 1h, funding_rate and store in /freqtrade/user_data/data/binance. From 
+2020-01-01T00:00:00 to 2021-11-30T00:00:00
+2026-04-10 16:22:25,099 - freqtrade.data.history.history_utils - INFO - Downloaded data for ETH/USDT:USDT, 1h, funding_rate with length 3000.
+2026-04-10 16:22:25,102 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair BNB/USDT:USDT, 4h, futures.
+2026-04-10 16:22:25,104 - freqtrade.data.history.history_utils - INFO - Download history data for "BNB/USDT:USDT", 4h, futures and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00 
+to 2021-11-30T00:00:00
+2026-04-10 16:22:25,432 - freqtrade.exchange.binance - INFO - Candle-data for BNB/USDT:USDT available starting with 2020-02-10T08:00:00+00:00.
+2026-04-10 16:22:26,519 - freqtrade.data.history.history_utils - INFO - Downloaded data for BNB/USDT:USDT, 4h, futures with length 3991.
+2026-04-10 16:22:26,523 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair BNB/USDT:USDT, 1h, mark.
+2026-04-10 16:22:26,524 - freqtrade.data.history.history_utils - INFO - Download history data for "BNB/USDT:USDT", 1h, mark and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00 to 
+2021-11-30T00:00:00
+2026-04-10 16:22:30,599 - freqtrade.data.history.history_utils - INFO - Downloaded data for BNB/USDT:USDT, 1h, mark with length 16965.
+2026-04-10 16:22:30,605 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair BNB/USDT:USDT, 1h, funding_rate.
+2026-04-10 16:22:30,606 - freqtrade.data.history.history_utils - INFO - Download history data for "BNB/USDT:USDT", 1h, funding_rate and store in /freqtrade/user_data/data/binance. From 
+2020-01-01T00:00:00 to 2021-11-30T00:00:00
+2026-04-10 16:22:31,815 - freqtrade.data.history.history_utils - INFO - Downloaded data for BNB/USDT:USDT, 1h, funding_rate with length 2879.
+2026-04-10 16:22:31,819 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair XRP/USDT:USDT, 4h, futures.
+2026-04-10 16:22:31,820 - freqtrade.data.history.history_utils - INFO - Download history data for "XRP/USDT:USDT", 4h, futures and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00 
+to 2021-11-30T00:00:00
+2026-04-10 16:22:32,161 - freqtrade.exchange.binance - INFO - Candle-data for XRP/USDT:USDT available starting with 2020-01-06T08:00:00+00:00.
+2026-04-10 16:22:33,350 - freqtrade.data.history.history_utils - INFO - Downloaded data for XRP/USDT:USDT, 4h, futures with length 4490.
+2026-04-10 16:22:33,354 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair XRP/USDT:USDT, 1h, mark.
+2026-04-10 16:22:33,355 - freqtrade.data.history.history_utils - INFO - Download history data for "XRP/USDT:USDT", 1h, mark and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00 to 
+2021-11-30T00:00:00
+2026-04-10 16:22:33,722 - freqtrade.exchange.binance - INFO - Candle-data for XRP/USDT:USDT available starting with 2020-01-06T03:00:00+00:00.
+2026-04-10 16:22:37,419 - freqtrade.data.history.history_utils - INFO - Downloaded data for XRP/USDT:USDT, 1h, mark with length 16965.
+2026-04-10 16:22:37,427 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair XRP/USDT:USDT, 1h, funding_rate.
+2026-04-10 16:22:37,428 - freqtrade.data.history.history_utils - INFO - Download history data for "XRP/USDT:USDT", 1h, funding_rate and store in /freqtrade/user_data/data/binance. From 
+2020-01-01T00:00:00 to 2021-11-30T00:00:00
+2026-04-10 16:22:38,642 - freqtrade.data.history.history_utils - INFO - Downloaded data for XRP/USDT:USDT, 1h, funding_rate with length 2984.
+2026-04-10 16:22:38,645 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair SOL/USDT:USDT, 4h, futures.
+2026-04-10 16:22:38,646 - freqtrade.data.history.history_utils - INFO - Download history data for "SOL/USDT:USDT", 4h, futures and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00 
+to 2021-11-30T00:00:00
+2026-04-10 16:22:38,987 - freqtrade.exchange.binance - INFO - Candle-data for SOL/USDT:USDT available starting with 2020-09-14T04:00:00+00:00.
+2026-04-10 16:22:39,883 - freqtrade.data.history.history_utils - INFO - Downloaded data for SOL/USDT:USDT, 4h, futures with length 2993.
+2026-04-10 16:22:39,887 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair SOL/USDT:USDT, 1h, mark.
+2026-04-10 16:22:39,888 - freqtrade.data.history.history_utils - INFO - Download history data for "SOL/USDT:USDT", 1h, mark and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00 to 
+2021-11-30T00:00:00
+2026-04-10 16:22:40,262 - freqtrade.exchange.binance - INFO - Candle-data for SOL/USDT:USDT available starting with 2020-09-13T11:00:00+00:00.
+2026-04-10 16:22:42,747 - freqtrade.data.history.history_utils - INFO - Downloaded data for SOL/USDT:USDT, 1h, mark with length 10977.
+2026-04-10 16:22:42,753 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair SOL/USDT:USDT, 1h, funding_rate.
+2026-04-10 16:22:42,754 - freqtrade.data.history.history_utils - INFO - Download history data for "SOL/USDT:USDT", 1h, funding_rate and store in /freqtrade/user_data/data/binance. From 
+2020-01-01T00:00:00 to 2021-11-30T00:00:00
+2026-04-10 16:22:43,959 - freqtrade.data.history.history_utils - INFO - Downloaded data for SOL/USDT:USDT, 1h, funding_rate with length 2230.
+2026-04-10 16:22:43,962 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair ADA/USDT:USDT, 4h, futures.
+2026-04-10 16:22:43,963 - freqtrade.data.history.history_utils - INFO - Download history data for "ADA/USDT:USDT", 4h, futures and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00 
+to 2021-11-30T00:00:00
+2026-04-10 16:22:44,299 - freqtrade.exchange.binance - INFO - Candle-data for ADA/USDT:USDT available starting with 2020-01-31T08:00:00+00:00.
+2026-04-10 16:22:45,490 - freqtrade.data.history.history_utils - INFO - Downloaded data for ADA/USDT:USDT, 4h, futures with length 4490.
+2026-04-10 16:22:45,494 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair ADA/USDT:USDT, 1h, mark.
+2026-04-10 16:22:45,495 - freqtrade.data.history.history_utils - INFO - Download history data for "ADA/USDT:USDT", 1h, mark and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00 to 
+2021-11-30T00:00:00
+2026-04-10 16:22:45,867 - freqtrade.exchange.binance - INFO - Candle-data for ADA/USDT:USDT available starting with 2020-01-19T09:00:00+00:00.
+2026-04-10 16:22:49,479 - freqtrade.data.history.history_utils - INFO - Downloaded data for ADA/USDT:USDT, 1h, mark with length 16466.
+2026-04-10 16:22:49,487 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair ADA/USDT:USDT, 1h, funding_rate.
+2026-04-10 16:22:49,488 - freqtrade.data.history.history_utils - INFO - Download history data for "ADA/USDT:USDT", 1h, funding_rate and store in /freqtrade/user_data/data/binance. From 
+2020-01-01T00:00:00 to 2021-11-30T00:00:00
+2026-04-10 16:22:50,708 - freqtrade.data.history.history_utils - INFO - Downloaded data for ADA/USDT:USDT, 1h, funding_rate with length 2944.
+2026-04-10 16:22:50,712 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair DOGE/USDT:USDT, 4h, futures.
+2026-04-10 16:22:50,713 - freqtrade.data.history.history_utils - INFO - Download history data for "DOGE/USDT:USDT", 4h, futures and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00
+to 2021-11-30T00:00:00
+2026-04-10 16:22:51,036 - freqtrade.exchange.binance - INFO - Candle-data for DOGE/USDT:USDT available starting with 2020-07-10T08:00:00+00:00.
+2026-04-10 16:22:52,261 - freqtrade.data.history.history_utils - INFO - Downloaded data for DOGE/USDT:USDT, 4h, futures with length 3492.
+2026-04-10 16:22:52,264 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair DOGE/USDT:USDT, 1h, mark.
+2026-04-10 16:22:52,265 - freqtrade.data.history.history_utils - INFO - Download history data for "DOGE/USDT:USDT", 1h, mark and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00 to
+2021-11-30T00:00:00
+2026-04-10 16:22:52,646 - freqtrade.exchange.binance - INFO - Candle-data for DOGE/USDT:USDT available starting with 2020-07-10T03:00:00+00:00.
+2026-04-10 16:22:55,454 - freqtrade.data.history.history_utils - INFO - Downloaded data for DOGE/USDT:USDT, 1h, mark with length 12474.
+2026-04-10 16:22:55,461 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair DOGE/USDT:USDT, 1h, funding_rate.
+2026-04-10 16:22:55,462 - freqtrade.data.history.history_utils - INFO - Download history data for "DOGE/USDT:USDT", 1h, funding_rate and store in /freqtrade/user_data/data/binance. From 
+2020-01-01T00:00:00 to 2021-11-30T00:00:00
+2026-04-10 16:22:56,673 - freqtrade.data.history.history_utils - INFO - Downloaded data for DOGE/USDT:USDT, 1h, funding_rate with length 2426.
+2026-04-10 16:22:56,677 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair TRX/USDT:USDT, 4h, futures.
+2026-04-10 16:22:56,677 - freqtrade.data.history.history_utils - INFO - Download history data for "TRX/USDT:USDT", 4h, futures and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00 
+to 2021-11-30T00:00:00
+2026-04-10 16:22:57,010 - freqtrade.exchange.binance - INFO - Candle-data for TRX/USDT:USDT available starting with 2020-01-15T08:00:00+00:00.
+2026-04-10 16:22:58,194 - freqtrade.data.history.history_utils - INFO - Downloaded data for TRX/USDT:USDT, 4h, futures with length 4490.
+2026-04-10 16:22:58,198 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair TRX/USDT:USDT, 1h, mark.
+2026-04-10 16:22:58,199 - freqtrade.data.history.history_utils - INFO - Download history data for "TRX/USDT:USDT", 1h, mark and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00 to 
+2021-11-30T00:00:00
+2026-04-10 16:22:58,570 - freqtrade.exchange.binance - INFO - Candle-data for TRX/USDT:USDT available starting with 2020-01-15T03:00:00+00:00.
+2026-04-10 16:23:02,172 - freqtrade.data.history.history_utils - INFO - Downloaded data for TRX/USDT:USDT, 1h, mark with length 16466.
+2026-04-10 16:23:02,180 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair TRX/USDT:USDT, 1h, funding_rate.
+2026-04-10 16:23:02,181 - freqtrade.data.history.history_utils - INFO - Download history data for "TRX/USDT:USDT", 1h, funding_rate and store in /freqtrade/user_data/data/binance. From 
+2020-01-01T00:00:00 to 2021-11-30T00:00:00
+2026-04-10 16:23:03,389 - freqtrade.data.history.history_utils - INFO - Downloaded data for TRX/USDT:USDT, 1h, funding_rate with length 2957.
+2026-04-10 16:23:03,392 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair DOT/USDT:USDT, 4h, futures.
+2026-04-10 16:23:03,393 - freqtrade.data.history.history_utils - INFO - Download history data for "DOT/USDT:USDT", 4h, futures and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00 
+to 2021-11-30T00:00:00
+2026-04-10 16:23:03,750 - freqtrade.exchange.binance - INFO - Candle-data for DOT/USDT:USDT available starting with 2020-08-22T04:00:00+00:00.
+2026-04-10 16:23:04,655 - freqtrade.data.history.history_utils - INFO - Downloaded data for DOT/USDT:USDT, 4h, futures with length 2993.
+2026-04-10 16:23:04,659 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair DOT/USDT:USDT, 1h, mark.
+2026-04-10 16:23:04,660 - freqtrade.data.history.history_utils - INFO - Download history data for "DOT/USDT:USDT", 1h, mark and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00 to 
+2021-11-30T00:00:00
+2026-04-10 16:23:05,036 - freqtrade.exchange.binance - INFO - Candle-data for DOT/USDT:USDT available starting with 2020-08-20T02:00:00+00:00.
+2026-04-10 16:23:07,635 - freqtrade.data.history.history_utils - INFO - Downloaded data for DOT/USDT:USDT, 1h, mark with length 11476.
+2026-04-10 16:23:07,641 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair DOT/USDT:USDT, 1h, funding_rate.
+2026-04-10 16:23:07,642 - freqtrade.data.history.history_utils - INFO - Download history data for "DOT/USDT:USDT", 1h, funding_rate and store in /freqtrade/user_data/data/binance. From 
+2020-01-01T00:00:00 to 2021-11-30T00:00:00
+2026-04-10 16:23:08,844 - freqtrade.data.history.history_utils - INFO - Downloaded data for DOT/USDT:USDT, 1h, funding_rate with length 2303.
+2026-04-10 16:23:08,847 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair LINK/USDT:USDT, 4h, futures.
+2026-04-10 16:23:08,848 - freqtrade.data.history.history_utils - INFO - Download history data for "LINK/USDT:USDT", 4h, futures and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00
+to 2021-11-30T00:00:00
+2026-04-10 16:23:09,189 - freqtrade.exchange.binance - INFO - Candle-data for LINK/USDT:USDT available starting with 2020-01-17T08:00:00+00:00.
+2026-04-10 16:23:10,373 - freqtrade.data.history.history_utils - INFO - Downloaded data for LINK/USDT:USDT, 4h, futures with length 4490.
+2026-04-10 16:23:10,376 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair LINK/USDT:USDT, 1h, mark.
+2026-04-10 16:23:10,377 - freqtrade.data.history.history_utils - INFO - Download history data for "LINK/USDT:USDT", 1h, mark and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00 to
+2021-11-30T00:00:00
+2026-04-10 16:23:10,750 - freqtrade.exchange.binance - INFO - Candle-data for LINK/USDT:USDT available starting with 2020-01-17T07:00:00+00:00.
+2026-04-10 16:23:14,348 - freqtrade.data.history.history_utils - INFO - Downloaded data for LINK/USDT:USDT, 1h, mark with length 16466.
+2026-04-10 16:23:14,356 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair LINK/USDT:USDT, 1h, funding_rate.
+2026-04-10 16:23:14,357 - freqtrade.data.history.history_utils - INFO - Download history data for "LINK/USDT:USDT", 1h, funding_rate and store in /freqtrade/user_data/data/binance. From 
+2020-01-01T00:00:00 to 2021-11-30T00:00:00
+2026-04-10 16:23:15,559 - freqtrade.data.history.history_utils - INFO - Downloaded data for LINK/USDT:USDT, 1h, funding_rate with length 2951.
+2026-04-10 16:23:15,563 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair AVAX/USDT:USDT, 4h, futures.
+2026-04-10 16:23:15,564 - freqtrade.data.history.history_utils - INFO - Download history data for "AVAX/USDT:USDT", 4h, futures and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00
+to 2021-11-30T00:00:00
+2026-04-10 16:23:15,891 - freqtrade.exchange.binance - INFO - Candle-data for AVAX/USDT:USDT available starting with 2020-09-23T04:00:00+00:00.
+2026-04-10 16:23:16,775 - freqtrade.data.history.history_utils - INFO - Downloaded data for AVAX/USDT:USDT, 4h, futures with length 2993.
+2026-04-10 16:23:16,778 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair AVAX/USDT:USDT, 1h, mark.
+2026-04-10 16:23:16,779 - freqtrade.data.history.history_utils - INFO - Download history data for "AVAX/USDT:USDT", 1h, mark and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00 to
+2021-11-30T00:00:00
+2026-04-10 16:23:17,154 - freqtrade.exchange.binance - INFO - Candle-data for AVAX/USDT:USDT available starting with 2020-09-22T09:00:00+00:00.
+2026-04-10 16:23:19,533 - freqtrade.data.history.history_utils - INFO - Downloaded data for AVAX/USDT:USDT, 1h, mark with length 10478.
+2026-04-10 16:23:19,538 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair AVAX/USDT:USDT, 1h, funding_rate.
+2026-04-10 16:23:19,539 - freqtrade.data.history.history_utils - INFO - Download history data for "AVAX/USDT:USDT", 1h, funding_rate and store in /freqtrade/user_data/data/binance. From 
+2020-01-01T00:00:00 to 2021-11-30T00:00:00
+2026-04-10 16:23:20,743 - freqtrade.data.history.history_utils - INFO - Downloaded data for AVAX/USDT:USDT, 1h, funding_rate with length 2203.
+2026-04-10 16:23:20,746 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair ETC/USDT:USDT, 4h, futures.
+2026-04-10 16:23:20,747 - freqtrade.data.history.history_utils - INFO - Download history data for "ETC/USDT:USDT", 4h, futures and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00 
+to 2021-11-30T00:00:00
+2026-04-10 16:23:21,069 - freqtrade.exchange.binance - INFO - Candle-data for ETC/USDT:USDT available starting with 2020-01-16T08:00:00+00:00.
+2026-04-10 16:23:22,251 - freqtrade.data.history.history_utils - INFO - Downloaded data for ETC/USDT:USDT, 4h, futures with length 4490.
+2026-04-10 16:23:22,255 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair ETC/USDT:USDT, 1h, mark.
+2026-04-10 16:23:22,256 - freqtrade.data.history.history_utils - INFO - Download history data for "ETC/USDT:USDT", 1h, mark and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00 to 
+2021-11-30T00:00:00
+2026-04-10 16:23:22,639 - freqtrade.exchange.binance - INFO - Candle-data for ETC/USDT:USDT available starting with 2020-01-16T06:00:00+00:00.
+2026-04-10 16:23:26,225 - freqtrade.data.history.history_utils - INFO - Downloaded data for ETC/USDT:USDT, 1h, mark with length 16466.
+2026-04-10 16:23:26,233 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair ETC/USDT:USDT, 1h, funding_rate.
+2026-04-10 16:23:26,234 - freqtrade.data.history.history_utils - INFO - Download history data for "ETC/USDT:USDT", 1h, funding_rate and store in /freqtrade/user_data/data/binance. From 
+2020-01-01T00:00:00 to 2021-11-30T00:00:00
+2026-04-10 16:23:27,439 - freqtrade.data.history.history_utils - INFO - Downloaded data for ETC/USDT:USDT, 1h, funding_rate with length 2954.
+2026-04-10 16:23:27,442 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair LTC/USDT:USDT, 4h, futures.
+2026-04-10 16:23:27,443 - freqtrade.data.history.history_utils - INFO - Download history data for "LTC/USDT:USDT", 4h, futures and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00 
+to 2021-11-30T00:00:00
+2026-04-10 16:23:27,765 - freqtrade.exchange.binance - INFO - Candle-data for LTC/USDT:USDT available starting with 2020-01-09T08:00:00+00:00.
+2026-04-10 16:23:28,942 - freqtrade.data.history.history_utils - INFO - Downloaded data for LTC/USDT:USDT, 4h, futures with length 4490.
+2026-04-10 16:23:28,946 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair LTC/USDT:USDT, 1h, mark.
+2026-04-10 16:23:28,947 - freqtrade.data.history.history_utils - INFO - Download history data for "LTC/USDT:USDT", 1h, mark and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00 to 
+2021-11-30T00:00:00
+2026-04-10 16:23:29,318 - freqtrade.exchange.binance - INFO - Candle-data for LTC/USDT:USDT available starting with 2020-01-09T04:00:00+00:00.
+2026-04-10 16:23:33,022 - freqtrade.data.history.history_utils - INFO - Downloaded data for LTC/USDT:USDT, 1h, mark with length 16965.
+2026-04-10 16:23:33,030 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair LTC/USDT:USDT, 1h, funding_rate.
+2026-04-10 16:23:33,031 - freqtrade.data.history.history_utils - INFO - Download history data for "LTC/USDT:USDT", 1h, funding_rate and store in /freqtrade/user_data/data/binance. From 
+2020-01-01T00:00:00 to 2021-11-30T00:00:00
+2026-04-10 16:23:34,237 - freqtrade.data.history.history_utils - INFO - Downloaded data for LTC/USDT:USDT, 1h, funding_rate with length 2975.
+2026-04-10 16:23:34,241 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair XLM/USDT:USDT, 4h, futures.
+2026-04-10 16:23:34,243 - freqtrade.data.history.history_utils - INFO - Download history data for "XLM/USDT:USDT", 4h, futures and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00 
+to 2021-11-30T00:00:00
+2026-04-10 16:23:34,564 - freqtrade.exchange.binance - INFO - Candle-data for XLM/USDT:USDT available starting with 2020-01-20T08:00:00+00:00.
+2026-04-10 16:23:35,747 - freqtrade.data.history.history_utils - INFO - Downloaded data for XLM/USDT:USDT, 4h, futures with length 4490.
+2026-04-10 16:23:35,751 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair XLM/USDT:USDT, 1h, mark.
+2026-04-10 16:23:35,752 - freqtrade.data.history.history_utils - INFO - Download history data for "XLM/USDT:USDT", 1h, mark and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00 to 
+2021-11-30T00:00:00
+2026-04-10 16:23:36,120 - freqtrade.exchange.binance - INFO - Candle-data for XLM/USDT:USDT available starting with 2020-01-19T09:00:00+00:00.
+2026-04-10 16:23:39,701 - freqtrade.data.history.history_utils - INFO - Downloaded data for XLM/USDT:USDT, 1h, mark with length 16466.
+2026-04-10 16:23:39,708 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair XLM/USDT:USDT, 1h, funding_rate.
+2026-04-10 16:23:39,710 - freqtrade.data.history.history_utils - INFO - Download history data for "XLM/USDT:USDT", 1h, funding_rate and store in /freqtrade/user_data/data/binance. From 
+2020-01-01T00:00:00 to 2021-11-30T00:00:00
+2026-04-10 16:23:40,912 - freqtrade.data.history.history_utils - INFO - Downloaded data for XLM/USDT:USDT, 1h, funding_rate with length 2944.
+2026-04-10 16:23:40,915 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair ATOM/USDT:USDT, 4h, futures.
+2026-04-10 16:23:40,916 - freqtrade.data.history.history_utils - INFO - Download history data for "ATOM/USDT:USDT", 4h, futures and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00
+to 2021-11-30T00:00:00
+2026-04-10 16:23:41,239 - freqtrade.exchange.binance - INFO - Candle-data for ATOM/USDT:USDT available starting with 2020-02-07T12:00:00+00:00.
+2026-04-10 16:23:42,320 - freqtrade.data.history.history_utils - INFO - Downloaded data for ATOM/USDT:USDT, 4h, futures with length 3991.
+2026-04-10 16:23:42,324 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair ATOM/USDT:USDT, 1h, mark.
+2026-04-10 16:23:42,325 - freqtrade.data.history.history_utils - INFO - Download history data for "ATOM/USDT:USDT", 1h, mark and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00 to
+2021-11-30T00:00:00
+2026-04-10 16:23:42,714 - freqtrade.exchange.binance - INFO - Candle-data for ATOM/USDT:USDT available starting with 2020-02-06T08:00:00+00:00.
+2026-04-10 16:23:46,208 - freqtrade.data.history.history_utils - INFO - Downloaded data for ATOM/USDT:USDT, 1h, mark with length 15967.
+2026-04-10 16:23:46,216 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair ATOM/USDT:USDT, 1h, funding_rate.
+2026-04-10 16:23:46,217 - freqtrade.data.history.history_utils - INFO - Download history data for "ATOM/USDT:USDT", 1h, funding_rate and store in /freqtrade/user_data/data/binance. From 
+2020-01-01T00:00:00 to 2021-11-30T00:00:00
+2026-04-10 16:23:47,421 - freqtrade.data.history.history_utils - INFO - Downloaded data for ATOM/USDT:USDT, 1h, funding_rate with length 2890.
+2026-04-10 16:23:47,424 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair NEAR/USDT:USDT, 4h, futures.
+2026-04-10 16:23:47,425 - freqtrade.data.history.history_utils - INFO - Download history data for "NEAR/USDT:USDT", 4h, futures and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00
+to 2021-11-30T00:00:00
+2026-04-10 16:23:47,767 - freqtrade.exchange.binance - INFO - Candle-data for NEAR/USDT:USDT available starting with 2020-10-15T08:00:00+00:00.
+2026-04-10 16:23:48,556 - freqtrade.data.history.history_utils - INFO - Downloaded data for NEAR/USDT:USDT, 4h, futures with length 2494.
+2026-04-10 16:23:48,559 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair NEAR/USDT:USDT, 1h, mark.
+2026-04-10 16:23:48,560 - freqtrade.data.history.history_utils - INFO - Download history data for "NEAR/USDT:USDT", 1h, mark and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00 to
+2021-11-30T00:00:00
+2026-04-10 16:23:48,937 - freqtrade.exchange.binance - INFO - Candle-data for NEAR/USDT:USDT available starting with 2020-10-14T09:00:00+00:00.
+2026-04-10 16:23:51,218 - freqtrade.data.history.history_utils - INFO - Downloaded data for NEAR/USDT:USDT, 1h, mark with length 9979.
+2026-04-10 16:23:51,223 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair NEAR/USDT:USDT, 1h, funding_rate.
+2026-04-10 16:23:51,224 - freqtrade.data.history.history_utils - INFO - Download history data for "NEAR/USDT:USDT", 1h, funding_rate and store in /freqtrade/user_data/data/binance. From 
+2020-01-01T00:00:00 to 2021-11-30T00:00:00
+2026-04-10 16:23:52,433 - freqtrade.data.history.history_utils - INFO - Downloaded data for NEAR/USDT:USDT, 1h, funding_rate with length 2137.
+2026-04-10 16:23:52,436 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair APT/USDT:USDT, 4h, futures.
+2026-04-10 16:23:52,437 - freqtrade.data.history.history_utils - INFO - Download history data for "APT/USDT:USDT", 4h, futures and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00 
+to 2021-11-30T00:00:00
+2026-04-10 16:23:52,763 - freqtrade.exchange.binance - INFO - Candle-data for APT/USDT:USDT available starting with 2022-10-19T00:00:00+00:00.
+2026-04-10 16:23:52,764 - freqtrade.exchange.binance - WARNING - No available candle-data for APT/USDT:USDT before 2021-11-30T00:00:00+00:00
+2026-04-10 16:23:52,765 - freqtrade.data.history.history_utils - INFO - Downloaded data for APT/USDT:USDT, 4h, futures with length 0.
+2026-04-10 16:23:52,767 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair APT/USDT:USDT, 1h, mark.
+2026-04-10 16:23:52,767 - freqtrade.data.history.history_utils - INFO - Download history data for "APT/USDT:USDT", 1h, mark and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00 to 
+2021-11-30T00:00:00
+2026-04-10 16:23:53,149 - freqtrade.exchange.binance - INFO - Candle-data for APT/USDT:USDT available starting with 2022-10-19T01:00:00+00:00.
+2026-04-10 16:23:53,150 - freqtrade.exchange.binance - WARNING - No available candle-data for APT/USDT:USDT before 2021-11-30T00:00:00+00:00
+2026-04-10 16:23:53,151 - freqtrade.data.history.history_utils - INFO - Downloaded data for APT/USDT:USDT, 1h, mark with length 0.
+2026-04-10 16:23:53,152 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair APT/USDT:USDT, 1h, funding_rate.
+2026-04-10 16:23:53,153 - freqtrade.data.history.history_utils - INFO - Download history data for "APT/USDT:USDT", 1h, funding_rate and store in /freqtrade/user_data/data/binance. From 
+2020-01-01T00:00:00 to 2021-11-30T00:00:00
+2026-04-10 16:23:54,371 - freqtrade.data.history.history_utils - INFO - Downloaded data for APT/USDT:USDT, 1h, funding_rate with length 1000.
+2026-04-10 16:23:54,374 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair OP/USDT:USDT, 4h, futures.
+2026-04-10 16:23:54,375 - freqtrade.data.history.history_utils - INFO - Download history data for "OP/USDT:USDT", 4h, futures and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00 
+to 2021-11-30T00:00:00
+2026-04-10 16:23:54,711 - freqtrade.exchange.binance - INFO - Candle-data for OP/USDT:USDT available starting with 2022-06-01T12:00:00+00:00.
+2026-04-10 16:23:54,712 - freqtrade.exchange.binance - WARNING - No available candle-data for OP/USDT:USDT before 2021-11-30T00:00:00+00:00
+2026-04-10 16:23:54,713 - freqtrade.data.history.history_utils - INFO - Downloaded data for OP/USDT:USDT, 4h, futures with length 0.
+2026-04-10 16:23:54,714 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair OP/USDT:USDT, 1h, mark.
+2026-04-10 16:23:54,715 - freqtrade.data.history.history_utils - INFO - Download history data for "OP/USDT:USDT", 1h, mark and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00 to 
+2021-11-30T00:00:00
+2026-04-10 16:23:55,087 - freqtrade.exchange.binance - INFO - Candle-data for OP/USDT:USDT available starting with 2022-06-01T06:00:00+00:00.
+2026-04-10 16:23:55,088 - freqtrade.exchange.binance - WARNING - No available candle-data for OP/USDT:USDT before 2021-11-30T00:00:00+00:00
+2026-04-10 16:23:55,089 - freqtrade.data.history.history_utils - INFO - Downloaded data for OP/USDT:USDT, 1h, mark with length 0.
+2026-04-10 16:23:55,090 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair OP/USDT:USDT, 1h, funding_rate.
+2026-04-10 16:23:55,091 - freqtrade.data.history.history_utils - INFO - Download history data for "OP/USDT:USDT", 1h, funding_rate and store in /freqtrade/user_data/data/binance. From 
+2020-01-01T00:00:00 to 2021-11-30T00:00:00
+2026-04-10 16:23:56,296 - freqtrade.data.history.history_utils - INFO - Downloaded data for OP/USDT:USDT, 1h, funding_rate with length 1000.
+2026-04-10 16:23:56,299 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair ARB/USDT:USDT, 4h, futures.
+2026-04-10 16:23:56,300 - freqtrade.data.history.history_utils - INFO - Download history data for "ARB/USDT:USDT", 4h, futures and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00 
+to 2021-11-30T00:00:00
+2026-04-10 16:23:56,625 - freqtrade.exchange.binance - INFO - Candle-data for ARB/USDT:USDT available starting with 2023-03-23T12:00:00+00:00.
+2026-04-10 16:23:56,625 - freqtrade.exchange.binance - WARNING - No available candle-data for ARB/USDT:USDT before 2021-11-30T00:00:00+00:00
+2026-04-10 16:23:56,626 - freqtrade.data.history.history_utils - INFO - Downloaded data for ARB/USDT:USDT, 4h, futures with length 0.
+2026-04-10 16:23:56,628 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair ARB/USDT:USDT, 1h, mark.
+2026-04-10 16:23:56,629 - freqtrade.data.history.history_utils - INFO - Download history data for "ARB/USDT:USDT", 1h, mark and store in /freqtrade/user_data/data/binance. From 2020-01-01T00:00:00 to 
+2021-11-30T00:00:00
+2026-04-10 16:23:56,996 - freqtrade.exchange.binance - INFO - Candle-data for ARB/USDT:USDT available starting with 2023-03-23T13:00:00+00:00.
+2026-04-10 16:23:56,996 - freqtrade.exchange.binance - WARNING - No available candle-data for ARB/USDT:USDT before 2021-11-30T00:00:00+00:00
+2026-04-10 16:23:56,997 - freqtrade.data.history.history_utils - INFO - Downloaded data for ARB/USDT:USDT, 1h, mark with length 0.
+2026-04-10 16:23:56,999 - freqtrade.data.history.history_utils - INFO - Deleting existing data for pair ARB/USDT:USDT, 1h, funding_rate.
+2026-04-10 16:23:57,000 - freqtrade.data.history.history_utils - INFO - Download history data for "ARB/USDT:USDT", 1h, funding_rate and store in /freqtrade/user_data/data/binance. From 
+2020-01-01T00:00:00 to 2021-11-30T00:00:00
+2026-04-10 16:23:58,209 - freqtrade.data.history.history_utils - INFO - Downloaded data for ARB/USDT:USDT, 1h, funding_rate with length 1000.
+Timeframe                 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3/3   100% • 0:00:06 • 0:00:00
+Downloading ARB/USDT:USDT ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 19/19 100% • 0:01:46 • 0:00:00
+[18:23:59] Download complete for BULL_RUN.
+-----------------------------------------------------------------
+[18:23:59] Running backtest for BULL_RUN...
+-----------------------------------------------------------------
+time="2026-04-10T18:24:00+02:00" level=warning msg="Found orphan containers ([ft-freqtrade-run-66529e033ab4]) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+ Container ft-freqtrade-run-ff8dd58d92a0 Creating 
+ Container ft-freqtrade-run-ff8dd58d92a0 Created 
+2026-04-10 16:24:01,229 - freqtrade - INFO - freqtrade docker-2026.4-dev-ed6899aa
+2026-04-10 16:24:01,494 - numexpr.utils - INFO - NumExpr defaulting to 12 threads.
+2026-04-10 16:24:02,942 - freqtrade.configuration.load_config - INFO - Using config: user_data/config.json ...
+2026-04-10 16:24:02,944 - freqtrade.loggers - INFO - Enabling colorized output.
+2026-04-10 16:24:02,944 - freqtrade.loggers - INFO - Logfile configured
+2026-04-10 16:24:02,944 - freqtrade.loggers - INFO - Verbosity set to 0
+2026-04-10 16:24:02,945 - freqtrade.configuration.configuration - INFO - Parameter -i/--timeframe detected ... Using timeframe: 4h ...
+2026-04-10 16:24:02,945 - freqtrade.configuration.configuration - INFO - Using max_open_trades: 1 ...
+2026-04-10 16:24:02,945 - freqtrade.configuration.configuration - INFO - Parameter --timerange detected: 20200101-20211130 ...
+2026-04-10 16:24:02,952 - freqtrade.configuration.configuration - INFO - Using user-data directory: /freqtrade/user_data ...
+2026-04-10 16:24:02,953 - freqtrade.configuration.configuration - INFO - Using data directory: /freqtrade/user_data/data/binance ...
+2026-04-10 16:24:02,953 - freqtrade.configuration.configuration - INFO - Parameter --cache=day detected ...
+2026-04-10 16:24:02,953 - freqtrade.configuration.configuration - INFO - Filter trades by timerange: 20200101-20211130
+2026-04-10 16:24:02,954 - freqtrade.exchange.check_exchange - INFO - Checking exchange...
+2026-04-10 16:24:02,961 - freqtrade.exchange.check_exchange - INFO - Exchange "binance" is officially supported by the Freqtrade development team.
+2026-04-10 16:24:02,962 - freqtrade.configuration.configuration - INFO - Using pairlist from configuration.
+2026-04-10 16:24:02,962 - freqtrade.configuration.config_validation - INFO - Validating configuration ...
+2026-04-10 16:24:02,966 - freqtrade.commands.optimize_commands - INFO - Starting freqtrade in Backtesting mode
+2026-04-10 16:24:02,966 - freqtrade.exchange.exchange - INFO - Instance is running with dry_run enabled
+2026-04-10 16:24:02,967 - freqtrade.exchange.exchange - INFO - Using CCXT 4.5.46
+2026-04-10 16:24:02,967 - freqtrade.exchange.exchange - INFO - Applying additional ccxt config: {'options': {'defaultType': 'swap'}}
+2026-04-10 16:24:02,974 - freqtrade.exchange.exchange - INFO - Applying additional ccxt config: {'options': {'defaultType': 'swap'}}
+2026-04-10 16:24:02,982 - freqtrade.exchange.exchange - INFO - Using Exchange "Binance"
+2026-04-10 16:24:04,452 - freqtrade.resolvers.exchange_resolver - INFO - Using resolved exchange 'Binance'...
+2026-04-10 16:24:04,561 - freqtrade.resolvers.iresolver - INFO - Using resolved strategy KC_Breakout from '/freqtrade/user_data/strategies/KC_Breakout.py'...
+2026-04-10 16:24:04,562 - freqtrade.strategy.hyper - INFO - Found no parameter file.
+2026-04-10 16:24:04,562 - freqtrade.resolvers.strategy_resolver - INFO - Override strategy 'timeframe' with value from the configuration: 4h.
+2026-04-10 16:24:04,563 - freqtrade.resolvers.strategy_resolver - INFO - Override strategy 'stake_currency' with value from the configuration: USDT.
+2026-04-10 16:24:04,563 - freqtrade.resolvers.strategy_resolver - INFO - Override strategy 'stake_amount' with value from the configuration: unlimited.
+2026-04-10 16:24:04,563 - freqtrade.resolvers.strategy_resolver - INFO - Override strategy 'unfilledtimeout' with value from the configuration: {'entry': 10, 'exit': 10, 'exit_timeout_count': 0, 
+'unit': 'minutes'}.
+2026-04-10 16:24:04,564 - freqtrade.resolvers.strategy_resolver - INFO - Override strategy 'max_open_trades' with value from the configuration: 1.
+2026-04-10 16:24:04,564 - freqtrade.resolvers.strategy_resolver - INFO - Strategy using minimal_roi: {'0': 10.0}
+2026-04-10 16:24:04,564 - freqtrade.resolvers.strategy_resolver - INFO - Strategy using timeframe: 4h
+2026-04-10 16:24:04,565 - freqtrade.resolvers.strategy_resolver - INFO - Strategy using stoploss: -0.1
+2026-04-10 16:24:04,565 - freqtrade.resolvers.strategy_resolver - INFO - Strategy using trailing_stop: False
+2026-04-10 16:24:04,565 - freqtrade.resolvers.strategy_resolver - INFO - Strategy using trailing_stop_positive_offset: 0.0
+2026-04-10 16:24:04,565 - freqtrade.resolvers.strategy_resolver - INFO - Strategy using trailing_only_offset_is_reached: False
+2026-04-10 16:24:04,566 - freqtrade.resolvers.strategy_resolver - INFO - Strategy using use_custom_stoploss: True
+2026-04-10 16:24:04,566 - freqtrade.resolvers.strategy_resolver - INFO - Strategy using process_only_new_candles: True
+2026-04-10 16:24:04,566 - freqtrade.resolvers.strategy_resolver - INFO - Strategy using order_types: {'entry': 'limit', 'exit': 'limit', 'stoploss': 'limit', 'stoploss_on_exchange': False, 
+'stoploss_on_exchange_interval': 60}
+2026-04-10 16:24:04,566 - freqtrade.resolvers.strategy_resolver - INFO - Strategy using order_time_in_force: {'entry': 'GTC', 'exit': 'GTC'}
+2026-04-10 16:24:04,567 - freqtrade.resolvers.strategy_resolver - INFO - Strategy using stake_currency: USDT
+2026-04-10 16:24:04,567 - freqtrade.resolvers.strategy_resolver - INFO - Strategy using stake_amount: unlimited
+2026-04-10 16:24:04,567 - freqtrade.resolvers.strategy_resolver - INFO - Strategy using startup_candle_count: 200
+2026-04-10 16:24:04,568 - freqtrade.resolvers.strategy_resolver - INFO - Strategy using unfilledtimeout: {'entry': 10, 'exit': 10, 'exit_timeout_count': 0, 'unit': 'minutes'}
+2026-04-10 16:24:04,568 - freqtrade.resolvers.strategy_resolver - INFO - Strategy using use_exit_signal: False
+2026-04-10 16:24:04,568 - freqtrade.resolvers.strategy_resolver - INFO - Strategy using exit_profit_only: False
+2026-04-10 16:24:04,568 - freqtrade.resolvers.strategy_resolver - INFO - Strategy using ignore_roi_if_entry_signal: True
+2026-04-10 16:24:04,569 - freqtrade.resolvers.strategy_resolver - INFO - Strategy using exit_profit_offset: 0.0
+2026-04-10 16:24:04,569 - freqtrade.resolvers.strategy_resolver - INFO - Strategy using disable_dataframe_checks: False
+2026-04-10 16:24:04,570 - freqtrade.resolvers.strategy_resolver - INFO - Strategy using ignore_buying_expired_candle_after: 0
+2026-04-10 16:24:04,570 - freqtrade.resolvers.strategy_resolver - INFO - Strategy using position_adjustment_enable: False
+2026-04-10 16:24:04,570 - freqtrade.resolvers.strategy_resolver - INFO - Strategy using max_entry_position_adjustment: -1
+2026-04-10 16:24:04,570 - freqtrade.resolvers.strategy_resolver - INFO - Strategy using max_open_trades: 1
+2026-04-10 16:24:04,571 - freqtrade.configuration.config_validation - INFO - Validating configuration ...
+2026-04-10 16:24:04,588 - freqtrade.resolvers.iresolver - INFO - Using resolved pairlist StaticPairList from '/freqtrade/freqtrade/plugins/pairlist/StaticPairList.py'...
+2026-04-10 16:24:04,605 - freqtrade.plugins.pairlist.IPairList - WARNING - Pair MATIC/USDT:USDT is not compatible with exchange Binance. Removing it from whitelist..
+2026-04-10 16:24:04,611 - freqtrade.optimize.backtesting - INFO - Using fee 0.0500% - worst case fee from exchange (lowest tier).
+2026-04-10 16:24:04,641 - freqtrade.data.history.datahandlers.idatahandler - WARNING - BTC/USDT:USDT, futures, 4h, data starts at 2020-01-01 00:00:00
+2026-04-10 16:24:04,657 - freqtrade.data.history.datahandlers.idatahandler - WARNING - ETH/USDT:USDT, futures, 4h, data starts at 2020-01-01 00:00:00
+2026-04-10 16:24:04,672 - freqtrade.data.history.datahandlers.idatahandler - WARNING - XRP/USDT:USDT, futures, 4h, data starts at 2020-01-06 08:00:00
+2026-04-10 16:24:04,685 - freqtrade.data.history.datahandlers.idatahandler - WARNING - SOL/USDT:USDT, futures, 4h, data starts at 2020-09-14 04:00:00
+2026-04-10 16:24:04,700 - freqtrade.data.history.datahandlers.idatahandler - WARNING - ADA/USDT:USDT, futures, 4h, data starts at 2020-01-31 08:00:00
+2026-04-10 16:24:04,713 - freqtrade.data.history.datahandlers.idatahandler - WARNING - DOGE/USDT:USDT, futures, 4h, data starts at 2020-07-10 08:00:00
+2026-04-10 16:24:04,727 - freqtrade.data.history.datahandlers.idatahandler - WARNING - TRX/USDT:USDT, futures, 4h, data starts at 2020-01-15 08:00:00
+2026-04-10 16:24:04,741 - freqtrade.data.history.datahandlers.idatahandler - WARNING - DOT/USDT:USDT, futures, 4h, data starts at 2020-08-22 04:00:00
+2026-04-10 16:24:04,755 - freqtrade.data.history.datahandlers.idatahandler - WARNING - LINK/USDT:USDT, futures, 4h, data starts at 2020-01-17 08:00:00
+2026-04-10 16:24:04,768 - freqtrade.data.history.datahandlers.idatahandler - WARNING - AVAX/USDT:USDT, futures, 4h, data starts at 2020-09-23 04:00:00
+2026-04-10 16:24:04,782 - freqtrade.data.history.datahandlers.idatahandler - WARNING - ETC/USDT:USDT, futures, 4h, data starts at 2020-01-16 08:00:00
+2026-04-10 16:24:04,796 - freqtrade.data.history.datahandlers.idatahandler - WARNING - LTC/USDT:USDT, futures, 4h, data starts at 2020-01-09 08:00:00
+2026-04-10 16:24:04,811 - freqtrade.data.history.datahandlers.idatahandler - WARNING - XLM/USDT:USDT, futures, 4h, data starts at 2020-01-20 08:00:00
+2026-04-10 16:24:04,825 - freqtrade.data.history.datahandlers.idatahandler - WARNING - ATOM/USDT:USDT, futures, 4h, data starts at 2020-02-07 12:00:00
+2026-04-10 16:24:04,838 - freqtrade.data.history.datahandlers.idatahandler - WARNING - NEAR/USDT:USDT, futures, 4h, data starts at 2020-10-15 08:00:00
+2026-04-10 16:24:04,848 - freqtrade.data.history.datahandlers.idatahandler - WARNING - No history for APT/USDT:USDT, futures, 4h found. Use `freqtrade download-data` to download the data
+2026-04-10 16:24:04,851 - freqtrade.data.history.datahandlers.idatahandler - WARNING - No history for OP/USDT:USDT, futures, 4h found. Use `freqtrade download-data` to download the data
+2026-04-10 16:24:04,853 - freqtrade.data.history.datahandlers.idatahandler - WARNING - No history for ARB/USDT:USDT, futures, 4h found. Use `freqtrade download-data` to download the data
+2026-04-10 16:24:04,856 - freqtrade.optimize.backtesting - INFO - Loading data from 2020-01-01 00:00:00 up to 2021-11-30 00:00:00 (699 days).
+2026-04-10 16:24:04,856 - freqtrade.configuration.timerange - WARNING - Moving start-date by 200 candles to account for startup time.
+2026-04-10 16:24:04,883 - freqtrade.data.history.datahandlers.idatahandler - WARNING - SOL/USDT:USDT, funding_rate, 1h, data starts at 2020-09-13 16:00:00
+2026-04-10 16:24:04,899 - freqtrade.data.history.datahandlers.idatahandler - WARNING - DOGE/USDT:USDT, funding_rate, 1h, data starts at 2020-07-10 08:00:00
+2026-04-10 16:24:04,914 - freqtrade.data.history.datahandlers.idatahandler - WARNING - DOT/USDT:USDT, funding_rate, 1h, data starts at 2020-08-20 08:00:00
+2026-04-10 16:24:04,929 - freqtrade.data.history.datahandlers.idatahandler - WARNING - AVAX/USDT:USDT, funding_rate, 1h, data starts at 2020-09-22 16:00:00
+2026-04-10 16:24:04,959 - freqtrade.data.history.datahandlers.idatahandler - WARNING - ATOM/USDT:USDT, funding_rate, 1h, data starts at 2020-02-06 16:00:00
+2026-04-10 16:24:04,966 - freqtrade.data.history.datahandlers.idatahandler - WARNING - NEAR/USDT:USDT, funding_rate, 1h, data starts at 2020-10-14 16:00:00
+2026-04-10 16:24:04,973 - freqtrade.data.history.datahandlers.idatahandler - WARNING - APT/USDT:USDT, funding_rate, 1h, data starts at 2022-10-18 16:00:00
+2026-04-10 16:24:04,974 - freqtrade.data.history.datahandlers.idatahandler - WARNING - No history for APT/USDT:USDT, funding_rate, 1h found. Use `freqtrade download-data` to download the data
+2026-04-10 16:24:04,979 - freqtrade.data.history.datahandlers.idatahandler - WARNING - OP/USDT:USDT, funding_rate, 1h, data starts at 2022-06-01 08:00:00
+2026-04-10 16:24:04,980 - freqtrade.data.history.datahandlers.idatahandler - WARNING - No history for OP/USDT:USDT, funding_rate, 1h found. Use `freqtrade download-data` to download the data
+2026-04-10 16:24:04,985 - freqtrade.data.history.datahandlers.idatahandler - WARNING - ARB/USDT:USDT, funding_rate, 1h, data starts at 2023-03-23 08:00:00
+2026-04-10 16:24:04,986 - freqtrade.data.history.datahandlers.idatahandler - WARNING - No history for ARB/USDT:USDT, funding_rate, 1h found. Use `freqtrade download-data` to download the data
+2026-04-10 16:24:05,051 - freqtrade.data.history.datahandlers.idatahandler - WARNING - SOL/USDT:USDT, mark, 1h, data starts at 2020-09-13 11:00:00
+2026-04-10 16:24:05,088 - freqtrade.data.history.datahandlers.idatahandler - WARNING - DOGE/USDT:USDT, mark, 1h, data starts at 2020-07-10 03:00:00
+2026-04-10 16:24:05,126 - freqtrade.data.history.datahandlers.idatahandler - WARNING - DOT/USDT:USDT, mark, 1h, data starts at 2020-08-20 02:00:00
+2026-04-10 16:24:05,162 - freqtrade.data.history.datahandlers.idatahandler - WARNING - AVAX/USDT:USDT, mark, 1h, data starts at 2020-09-22 09:00:00
+2026-04-10 16:24:05,236 - freqtrade.data.history.datahandlers.idatahandler - WARNING - ATOM/USDT:USDT, mark, 1h, data starts at 2020-02-06 08:00:00
+2026-04-10 16:24:05,256 - freqtrade.data.history.datahandlers.idatahandler - WARNING - NEAR/USDT:USDT, mark, 1h, data starts at 2020-10-14 09:00:00
+2026-04-10 16:24:05,267 - freqtrade.data.history.datahandlers.idatahandler - WARNING - No history for APT/USDT:USDT, mark, 1h found. Use `freqtrade download-data` to download the data
+2026-04-10 16:24:05,270 - freqtrade.data.history.datahandlers.idatahandler - WARNING - No history for OP/USDT:USDT, mark, 1h found. Use `freqtrade download-data` to download the data
+2026-04-10 16:24:05,273 - freqtrade.data.history.datahandlers.idatahandler - WARNING - No history for ARB/USDT:USDT, mark, 1h found. Use `freqtrade download-data` to download the data
+2026-04-10 16:24:05,800 - freqtrade.optimize.backtesting - INFO - Dataload complete. Calculating indicators
+2026-04-10 16:24:05,801 - freqtrade.optimize.backtesting - INFO - Running backtesting for Strategy KC_Breakout
+2026-04-10 16:24:05,802 - freqtrade.strategy.hyper - INFO - No params for buy found, using default values.
+2026-04-10 16:24:05,802 - freqtrade.strategy.hyper - INFO - Strategy Parameter(default): adx_period = 14
+2026-04-10 16:24:05,802 - freqtrade.strategy.hyper - INFO - Strategy Parameter(default): adx_threshold = 20
+2026-04-10 16:24:05,803 - freqtrade.strategy.hyper - INFO - Strategy Parameter(default): atr_period = 14
+2026-04-10 16:24:05,803 - freqtrade.strategy.hyper - INFO - Strategy Parameter(default): atr_sma_period = 20
+2026-04-10 16:24:05,803 - freqtrade.strategy.hyper - INFO - Strategy Parameter(default): kc_mult = 2.0
+2026-04-10 16:24:05,803 - freqtrade.strategy.hyper - INFO - Strategy Parameter(default): kc_period = 20
+2026-04-10 16:24:05,804 - freqtrade.strategy.hyper - INFO - Strategy Parameter(default): vol_mult = 1.5
+2026-04-10 16:24:05,804 - freqtrade.strategy.hyper - INFO - Strategy Parameter(default): vol_sma_period = 20
+2026-04-10 16:24:05,804 - freqtrade.strategy.hyper - INFO - No params for sell found, using default values.
+2026-04-10 16:24:05,804 - freqtrade.strategy.hyper - INFO - Strategy Parameter(default): atr_mult_sl = 1.5
+2026-04-10 16:24:05,805 - freqtrade.strategy.hyper - INFO - Strategy Parameter(default): rr_ratio = 3.0
+2026-04-10 16:24:05,856 - freqtrade.optimize.backtesting - INFO - Backtesting with data from 2020-02-03 08:00:00 up to 2021-11-30 00:00:00 (665 days).
+2026-04-10 16:24:06,014 - freqtrade.data.dataprovider - INFO - Loading data for ETH/USDT:USDT 4h from 2019-11-28 16:00:00 to 2021-11-30 00:00:00
+2026-04-10 16:24:06,021 - freqtrade.data.history.datahandlers.idatahandler - WARNING - ETH/USDT:USDT, futures, 4h, data starts at 2020-01-01 00:00:00
+2026-04-10 16:24:06,032 - freqtrade - ERROR - Fatal exception!
+Traceback (most recent call last):
+  File "/freqtrade/freqtrade/main.py", line 52, in main
+    return_code = args["func"](args)
+  File "/freqtrade/freqtrade/commands/optimize_commands.py", line 61, in start_backtesting
+    backtesting.start()
+    ~~~~~~~~~~~~~~~~~^^
+  File "/freqtrade/freqtrade/optimize/backtesting.py", line 1859, in start
+    min_date, max_date = self.backtest_one_strategy(strat, data, timerange)
+                         ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/freqtrade/freqtrade/optimize/backtesting.py", line 1787, in backtest_one_strategy
+    results = self.backtest(
+        processed=preprocessed,
+        start_date=min_date,
+        end_date=max_date,
+    )
+  File "/freqtrade/freqtrade/optimize/backtesting.py", line 1730, in backtest
+    self.backtest_loop(row, pair, current_time, trade_dir, not is_last_row)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/freqtrade/freqtrade/optimize/backtesting.py", line 1510, in backtest_loop
+    self._check_trade_exit(trade, row, current_time)  # Place exit order if necessary
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/freqtrade/freqtrade/optimize/backtesting.py", line 945, in _check_trade_exit
+    exits = self.strategy.should_exit(
+        trade,  # type: ignore
+    ...<5 lines>...
+        high=row[HIGH_IDX],
+    )
+  File "/freqtrade/freqtrade/strategy/interface.py", line 1454, in should_exit
+    roi_reached = not (enter and self.ignore_roi_if_entry_signal) and self.min_roi_reached(
+                                                                      ~~~~~~~~~~~~~~~~~~~~^
+        trade=trade, current_profit=current_profit_best, current_time=current_time
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/freqtrade/freqtrade/strategy/interface.py", line 1704, in min_roi_reached
+    _, roi = self.min_roi_reached_entry(trade, trade_dur, current_time)
+             ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/freqtrade/freqtrade/strategy/interface.py", line 1681, in min_roi_reached_entry
+    roi_list = [x for x in self.minimal_roi.keys() if x <= trade_dur]
+                                                      ^^^^^^^^^^^^^^
+TypeError: '<=' not supported between instances of 'str' and 'int'
+
