@@ -4,7 +4,6 @@
 
 - [**Code Projects**](code/PROJECTS.md)
 - [**Math Compendium**](math/COMPENDIUM.md)
-- [**IMC Prosperity**](imc_prosperity/index.md)
 - [**Crypto Trading**](crypto_trading/index.md)
 
 
