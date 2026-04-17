@@ -1,5 +1,3 @@
-# $\Gamma$
-
 ## Thesis
 
 **Gamma ($\Gamma$)** is a trading strategy grounded in **actual, concrete, market-agnostic** mathematical models.
@@ -39,19 +37,21 @@ capital — given a fixed capital base, fee structure, and leverage, while also 
 
 ## Phase I — Constraints & Ground Rules
 
-Gamma will be deployed on a VPS with starting capital $X = 100,000\$$. The exchange is **Bitget**,
+Gamma will be deployed with starting capital $X = 100,000$ USD. The exchange is **Binance**,
 trading **perpetual futures contracts** with leverage $L = 1$. The following rules are
 strategy-performance-agnostic — they hold regardless of what signal logic we eventually design:
 
 **Rule 1 — Controlled trade frequency.**
-Bitget perpetual futures carry non-trivial fees. At $L = 2$ and limit-order rate $f_r = 0.0004$,
-each round-trip costs $0.40 per trade regardless of outcome. Overtrading erodes edge faster than
-any signal weakness. Frequency must be governed by the $G > 0$ condition, not by intuition.
+Binance perpetual futures carry non-trivial fees. At $L = 1$ and round-trip fee rate $f_r = 0.0008$
+(two limit-order legs at 0.04% each), each full round-trip costs $X \cdot f_r = 100{,}000 \times 0.0008 = \$80$
+per trade regardless of outcome. Overtrading erodes edge faster than any signal weakness. Frequency
+must be governed by the $G > 0$ condition, not by intuition.
 
 **Rule 2 — Limit orders exclusively.**
-Limit orders on Bitget are approximately 60% cheaper than market orders. Given that fees are baked
+Limit orders on Binance are approximately 60% cheaper than market orders. Given that fees are baked
 into the mathematical model, using market orders would invalidate our fee assumptions. All entries
-and exits must use limit orders. The round-trip fee rate is therefore fixed at $f_r = 0.0004$.
+and exits must use limit orders. The per-leg maker fee is 0.04%, so the round-trip fee rate is
+fixed at $f_r = 0.0008$ (entry + exit).
 
 **Rule 3 — Large-move dependency.**
 Because frequency is controlled and each trade carries a fixed fee cost, each trade must carry
@@ -101,9 +101,11 @@ The partial derivatives are computed explicitly in §2.4 once $G$ is fully defin
 ### 2.2 — Why $G$, not $EV$
 
 $EV$ measures the average dollar return per trade. But dollar return is the wrong thing to maximise
-when reinvesting and compounding. Consider: a strategy with $EV = +50\$$ but high variance will
-destroy a 100,000$ account in a drawdown long before the expectation materialises. The St. Petersburg
-paradox formalises exactly this failure.
+when reinvesting and compounding. Consider: a strategy with $EV = +\$10{,}000$ per trade sounds
+attractive on a $100,000 account — that is a 10% expected return. But if the variance is large enough,
+an extended losing streak will destroy the account before the long-run expectation ever materialises.
+The St. Petersburg paradox generalises exactly this failure: a game with infinite $EV$ is worth
+almost nothing to a rational, wealth-compounding agent because the tail risk dominates.
 
 The correct objective for a sequence of reinvested trades is the **expected logarithmic wealth
 increment per trade**, or Expected Growth Rate:
@@ -115,13 +117,13 @@ unit risked. For a binary win/loss model this becomes:
 
 $$G(w, r, f) = w \cdot \log(1 + f \cdot r_\text{net}) + (1 - w) \cdot \log(1 - f \cdot r_\text{risk})$$
 
-Where the fee-adjusted net returns are:
+Where the fee-adjusted net returns are ($f_r = 0.0008$ is the round-trip rate):
 
-$$r_\text{net} = r - L \cdot f_r \qquad \text{(reward per unit risked, after fees)}$$
+$$r_\text{net} = r - L \cdot f_r \qquad \text{(reward per unit risked, after round-trip fees)}$$
 
-$$r_\text{risk} = r_2 + L \cdot f_r \qquad \text{(risk per unit risked, after fees)}$$
+$$r_\text{risk} = r_2 + L \cdot f_r \qquad \text{(risk per unit risked, after round-trip fees)}$$
 
-With our fixed parameters $L = 2$, $f_r = 0.0004$, $r_2 = 1$:
+With our fixed parameters $L = 1$, $f_r = 0.0008$, $r_2 = 1$:
 
 $$r_\text{net} = r - 0.0008, \qquad r_\text{risk} = 1.0008$$
 
@@ -150,82 +152,7 @@ The Kelly Criterion gives the optimal fraction of capital to risk per trade:
 $$K^* = \frac{w \cdot r - (1 - w) \cdot r_2}{r}$$
 
 $K^*$ is derived by maximising $G$ with respect to $f$ and setting $\partial G / \partial f = 0$.
-In the binary model this yields exactly the formula above, confirming internal # Standard 001
-
-**Authors:** Fedor Palko
-
-## Thesis
-
-The Gamma standard allows for easy validation of trading strategies based purely on mathematical calculations and theories. We aim to ground our strategy mathematically and design rules which work market-agnostic and should be a healthy indicator of strategy feasibility. In this document we outline both the standard, and an example strategy that is compliant.
-
-The example strategy is meant for institutions designed to grow capital. Think quant prop firms or retail traders.
-
-## Development Plan
-
-1. Defining the strategy scope, trading style
-2. Mathematical analysis
-3. Strategy design
-4. Strategy implementation
-5. Backtests, iteration
-6. Conclusion
-
-## 1. Defining the scope
-
-### 1.1. Basic constraints
-
-Before we can design the strategy itself, we need to set some basic information that we will work with:
-- The strategy will be backtested and paper traded with a budget of $100,000\$$ on the Binance exchange.
-- Our primary goal is to achieve steady growth without low-moderate risk levels.
-- Our trading approach will be momentum/trend following on the 4h timeframe.
-- We will only trade high-market cap pairs (excl. stable coins like `USDT` or `USDC`)
-- Our position sizing will be conservative, with only $1-2\%$ risked per each trade.
-- The Binance fee structure for futures and limit orders has been calculated as a single round-trip rate that we account for, set as $f = 0.0004$
-- We will not trade with any leverage whatsoever (so 1x)
-
-And then some elementary, pre-phase II mathematical criteria the strategy must pass:
-- It must exceed a winrate of $W$
-- Its expected growth rate per each trade must be $G > 0$
-- Its maximum drawdown must not exceed $D_{max}$
-- Its profit factor must be $PF > 1$
-
-The specific values for the variables will be grounded after the in-depth mathematical analysis.
-
-## 2. Mathematical analysis
-
-### 2.1. Methods
-
-In order to find the values of $W, G, D_{max}, PF$ we will utilize:
-- Integration to find the value from $W \in [\omega_{min}, \omega_{max}]$. For realistic purposes, we will set $\omega_{min} = 0.35$ and $\omega_{max} = 0.65$ to match standard institutional win rates.
-- Integration to find $R_w$ (the reward ratio in the standard R:R), if $R_w \in [\rho_{min}, \rho_{max}]$. We will set $\rho_{min} = 1$ and $\rho_{max} = 3$ to match conventional R:R ratios.
-- Integration to find $D_{max}$ (the maximum drawdown), if $D_{max} \in [\delta_{min}, \delta_{max}]$
-
-Our main rule is simple: **finding the maximum amount of $G$ possible thanks to integrals**. 
-
-### 2.2. Function
-
-Let's define $G$ as a function of $W$, $f$, $r$ (the position size as a decimal) and $R_w$: 
-
-$\boxed{G(W,Rw​,r,f)=W⋅ln[(1+r⋅Rw​)(1−f)]+(1−W)⋅ln[(1−r−f(2−r))]}​$
-
-This is going to be our main function we will use in integration.
-
-### 2.3. Boundary analysis
-
-We fix $r = 0.01$ (conservative end of our 1–2% range) and $f = 0.0004$. Setting $G = 0$ and solving for $W$ gives the minimum viable win rate as a function of $R_w$:
-
-$$W^*(R_w) = \frac{-\ln(1 - r - f(2-r))}{\ln\!\big((1+r \cdot R_w)(1-f)\big) - \ln(1 - r - f(2-r))}$$
-
-This is the **survival boundary** — any $(W, R_w)$ pair above this curve satisfies $G > 0$. Key observations from the boundary:
-
-- At $R_w = 1.0$ (1:1 R:R), you need roughly $W \geq 50.2\%$ just to survive fees
-- At $R_w = 2.0$, the floor drops to ~W ≥ 34%, comfortably inside your [0.35, 0.65] range
-- At R_w = 3.0, even W ≈ 26% would technically be viable — well below our ω_min
-
-The slider lets you see how tightening r to 2% affects the picture — the boundary barely shifts, confirming position sizing has minimal impact on viability at these levels. The dominant factor is R_w.
-
-**Conclusion for the standard:** any compliant strategy must target $R_w \geq 1.5$ as a hard minimum, which makes the $W$ requirement comfortably achievable within realistic institutional ranges.
-
-consistency between
+In the binary model this yields exactly the formula above, confirming internal consistency between
 §2.2 and §2.3.
 
 > **Practical note:** raw Kelly is aggressive and produces large drawdowns. Gamma uses
@@ -251,7 +178,9 @@ $$\mathbb{E}[G](f) = \frac{1}{\Delta R} \int_{r_\text{low}}^{r_\text{high}} \lef
 
 The second log term is constant in $r$ (since $r_2$ is fixed), so:
 
-$$\mathbb{E}[G](f) = \frac{\bar{w}}{\Delta R} \int_{r_\text{low}}^{r_\text{high}} \log(1 + f(r - Lf_r)) \, dr + (1 - \bar{w}) \cdot \log(1 - f \cdot r_\text{risk})$$
+$$\mathbb{E}[G](f) = \frac{\bar{w}}{\Delta R} \int_{r_\text{low}}^{r_\text{high}} \log(1 + f(r - L f_r)) \, dr + (1 - \bar{w}) \cdot \log(1 - f \cdot r_\text{risk})$$
+
+where $f_r = 0.0008$ is the round-trip fee rate.
 
 The remaining integral resolves via the closed form:
 
@@ -276,7 +205,7 @@ degradation under typical estimation error is less than 25% of nominal growth.
 
 ### 2.5 — Results & Constraints Table
 
-Computed with $L = 2$, $f_r = 0.0004$, $r_2 = 1$, half-Kelly sizing.
+Computed with $L = 1$, $f_r = 0.0008$ (round-trip), $r_2 = 1$, half-Kelly sizing.
 
 Minimum win rate required for $G > 0$ at each reward ratio:
 
@@ -287,14 +216,16 @@ Minimum win rate required for $G > 0$ at each reward ratio:
 | 2.5 | 0.287 | 0.0938 | 9.83% |
 | 3.0 | 0.251 | 0.1087 | 11.48% |
 
-Fee cost at $X = 500$ $, $L = 2$:
+Fee cost at $X = 100{,}000$ USD, $L = 1$, $f_r = 0.0008$ round-trip:
+
+$$\text{Fee per trade} = X \cdot L \cdot f_r = 100{,}000 \times 1 \times 0.0008 = \$80$$
 
 | Trades/day | Daily fee | % of capital |
 |:---:|:---:|:---:|
-| 1 | $0.40 | 0.08% |
-| 5 | $2.00 | 0.40% |
-| 10 | $4.00 | 0.80% |
-| 20 | $8.00 | 1.60% |
+| 1 | $80 | 0.08% |
+| 5 | $400 | 0.40% |
+| 10 | $800 | 0.80% |
+| 20 | $1,600 | 1.60% |
 
 Any Gamma-compliant algorithm must satisfy:
 
@@ -306,9 +237,9 @@ Any Gamma-compliant algorithm must satisfy:
 | $r_\text{low}$ | $\geq 1.5$ | Below this, required $w$ is unrealistically high |
 | Position sizing | $f = \frac{1}{2} K^*$ | Half-Kelly enforced to limit drawdown |
 | $D_i$ | $< 0.25 \cdot G(\bar{w}, \bar{r}, f^*)$ | Robustness tolerance |
-| Trade frequency | $\leq 10$/day | Beyond this, fees exceed 0.80%/day of capital |
-| Order type | Limit only | $f_r = 0.0004$ assumption requires this |
-| Leverage | $L = 2$ | Fixed; changing this invalidates all values above |
+| Trade frequency | $\leq 10$/day | Beyond this, fees exceed $800/day (0.80% of capital) |
+| Order type | Limit only | $f_r = 0.0008$ round-trip rate assumes limit orders on both legs |
+| Leverage | $L = 1$ | Fixed; changing this invalidates all values above |
 
 ### 2.6 — Conclusion
 
