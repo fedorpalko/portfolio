@@ -7,4 +7,4 @@ It includes strategy design theorems and theses, practical implementation via th
 
 Strategies are grounded to specific mathematical standards and quotas that they need to pass in order to be standard-certified.
 
-[**Standard 001**](standards/S001.md)
+[**Gamma ($\Gamma$)**](strats/gamma.md) is the first trading strategy designed this way.
