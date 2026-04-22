@@ -21,7 +21,7 @@ For most users, Quantlab isn't enough. Freqtrade is an awesome tool that can act
 
 ### Getting Started
 
-Create a virtual environment with `python -m venv venv`, then run `source venv/bin/activate` or another method of using the virtual environment. Then execute `python src/main.py` and you'll soon see a dashboard pop up in your browser. From there you can make changes to your configuration, run backtests and optimizations.
+Create a virtual environment with `python -m venv venv`, then run `source venv/bin/activate` or another method of using the virtual environment. Install dependencies via `pip install -r requirements.txt`. Then execute `python src/main.py` and you'll soon see a dashboard pop up in your browser. From there you can make changes to your configuration, run backtests and optimizations.
 
 ### Showcase
 
