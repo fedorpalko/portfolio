@@ -9,12 +9,12 @@ In this paper I hope to explore and build upon a standalone and simple EV per tr
 
 ## Sections
 
-1. EV Uniform Model
-2. EV Uniform Model (Fees and Commission)
-3. EV Volatile Model
-4. EV Volatile Model (Uncertain Winrate)
-5. Universal Growth Rate Model
-6. Conclusion
+1. [EV Uniform Model](#1-ev-uniform-model)
+2. [EV Uniform Model (Fees and Commission)](#2-ev-uniform-model-fees-and-commission)
+3. [EV Volatile Model](#3-ev-volatile-model)
+4. [EV Volatile Model (Uncertain Winrate)](#4-ev-volatile-model-uncertain-winrate)
+5. [Universal Growth Rate Model](#5-universal-growth-rate-model)
+6. [Conclusion](#6-conclusion)
 
 ## 1. EV Uniform Model
 
@@ -164,4 +164,214 @@ $$\tilde{\rho} = \$79.92 + \varepsilon, \quad \varepsilon \sim \mathcal{N}(0, 15
 
 So any individual trade could land well above or well below $\rho$. A run of trades with negative $\varepsilon$ can produce a drawdown despite the strategy being profitable in expectation. This is precisely why $\rho$ alone is an insufficient measure of strategy quality — and why Section 5 will introduce $G$, a growth rate that penalises strategies for their volatility, not just their average return.
 
-As we can see, $\tilde{\rho}$ is not a fixed number, but a random variable and more importantly, a random distribution. It's a different level from sections 1 and 2, where we worked with discrete math. But if you think this is scary, you ain't seen nothing yet.
+As we can see, $\tilde{\rho}$ is not a fixed number, but a random variable and more importantly, a random distribution. It's a different level from sections 1 and 2, where we worked with discrete math. We will require this to actually define $G$.
+
+## 4. EV Volatile Model (Uncertain Win Rate)
+
+### Thesis
+
+The volatile model in Section 3 introduced $\varepsilon$ to account for the fact that individual trade outcomes deviate from $\rho$ due to market noise. However, it still treats $\omega$ — the win rate — as a fixed, known quantity. In practice, $\omega$ is itself an estimate derived from a finite backtest sample. A strategy backtested over 20 trades gives a far less reliable win rate estimate than one backtested over 2000 trades, yet the Section 3 model treats both identically.
+
+This section addresses that by modelling $\omega$ as a normally distributed random variable rather than a fixed input. The result is a model with two stacked sources of uncertainty: noisy trade outcomes ($\varepsilon$) and a noisy win rate ($\omega$). Like Section 3, this model is intentionally incomplete — it does not yet penalise the strategy for these compounded uncertainties. That is the role of $G$ in Section 5.
+
+### Variables
+
+Building on all variables from Sections 1–3, we introduce:
+
+- $\bar{\omega}$ — the mean win rate, estimated as the plain average from backtest data
+- $\sigma_\omega$ — the standard deviation of the win rate estimate, derived from backtest sample size
+- $\omega$ — win rate, now treated as a random variable drawn from $\mathcal{N}(\bar{\omega}, \sigma_\omega^2)$
+
+### Derivation of $\bar{\omega}$
+
+$\bar{\omega}$ is simply the proportion of winning trades in the backtest sample. If the backtest contains $n$ trades of which $n_w$ were winners:
+
+$$\boxed{\bar{\omega} = \frac{n_w}{n}}$$
+
+This is the same $\omega$ used in Sections 1–3, now explicitly defined as a sample estimate rather than a known constant.
+
+### Derivation of $\sigma_\omega$
+
+We model each trade as an independent Bernoulli trial — it either wins with probability $\bar{\omega}$ or loses with probability $1 - \bar{\omega}$. This is consistent with the assumption already embedded in Section 1.
+
+For a proportion estimated from $n$ independent Bernoulli trials, the standard error of that estimate is a well-established statistical result:
+
+$$\boxed{\sigma_\omega = \sqrt{\frac{\bar{\omega}(1 - \bar{\omega})}{n}}}$$
+
+This formula captures the intuitive relationship between sample size and confidence: a larger backtest produces a smaller $\sigma_\omega$, meaning the win rate estimate is more trustworthy. A smaller backtest produces a larger $\sigma_\omega$, meaning the true win rate could plausibly differ significantly from $\bar{\omega}$.
+
+Note that $\sigma_\omega$ is fully determined by $\bar{\omega}$ and $n$ — both of which are already available from backtest data. No additional inputs are required.
+
+### Definition
+
+Win rate is now modelled as a random variable:
+
+$$\omega \sim \mathcal{N}(\bar{\omega}, \sigma_\omega^2)$$
+
+The notation $\mathcal{N}(\mu, \sigma^2)$ denotes a normal distribution with mean $\mu$ and variance $\sigma^2$ — the same bell curve introduced in Section 3. Here, the distribution is centered at $\bar{\omega}$ with spread determined by $\sigma_\omega$. Win rates far from $\bar{\omega}$ are possible but increasingly unlikely.
+
+Substituting this into the volatile model from Section 3, the full uncertain volatile expected value per trade is:
+
+$$\boxed{\tilde{\rho} = (\omega \cdot S \cdot L \cdot \bar{R}) - ((1 - \omega) \cdot S \cdot L) - (f_e + f_x) \cdot S \cdot L + \varepsilon}$$
+
+Where both $\omega \sim \mathcal{N}(\bar{\omega}, \sigma_\omega^2)$ and $\varepsilon \sim \mathcal{N}(0, \sigma^2)$ are now random. The formula is structurally identical to Section 3 — the only change is that $\omega$ is no longer a fixed number.
+
+It follows that $\mathbb{E}[\tilde{\rho}] = \rho$ still holds, since $\mathbb{E}[\omega] = \bar{\omega}$ and $\mathbb{E}[\varepsilon] = 0$. However, the variance of $\tilde{\rho}$ is now larger than in Section 3, because uncertainty in $\omega$ adds a second layer of spread on top of $\varepsilon$.
+
+### Example
+
+Using the same parameters as before, now with a small backtest:
+- $\bar{\omega} = 0.60$, $n = 30$ trades
+- RR: 1:2, Stake: $50, Leverage: 2x
+- Fees: 0.2% entry, 0.2% exit
+- Backtest $\sigma$: $15
+
+First, we derive $\sigma_\omega$:
+
+$$\sigma_\omega = \sqrt{\frac{0.60 \cdot 0.40}{30}} = \sqrt{\frac{0.24}{30}} = \sqrt{0.008} \approx 0.0894$$
+
+So the true win rate could realistically fall anywhere from ~$42\%$ to ~$78\%$ within two standard deviations of $\bar{\omega}$. For a strategy whose profitability depends on maintaining a 60\% win rate, this is a significant uncertainty — and one that a 30-trade backtest simply cannot resolve.
+
+Compare this to a 1000-trade backtest:
+
+$$\sigma_\omega = \sqrt{\frac{0.60 \cdot 0.40}{1000}} = \sqrt{0.00024} \approx 0.0155$$
+
+Now the win rate is reliably within ~$57\%$ to ~$63\%$ — a much tighter and more trustworthy estimate. This illustrates why backtest sample size is not just a technicality but a core input to strategy evaluation, and why Section 5's $G$ must account for it.
+
+## 5. Universal Growth Rate Model
+
+### Thesis
+
+Sections 1 through 4 each built one layer of realism onto the original EV formula. Section 1 established the base expected profit per trade $\rho$. Section 2 introduced fee drag. Section 3 introduced volatility via $\sigma$. Section 4 introduced win rate uncertainty via $\sigma_\omega$. Each model was intentionally left incomplete — a stepping stone rather than a destination.
+
+This section is the destination.
+
+$G$ is the Universal Growth Rate — the average percentage by which your capital grows per trade, accounting for edge, fees, volatility drag, and win rate uncertainty simultaneously. It is the single number that determines whether a strategy is worth running. $G > 0$ means your capital grows. $G < 0$ means your capital erodes, even if $\rho > 0$. $G = 0$ means you are breaking even after every source of drag has been accounted for.
+
+This is also the first section to operate in a different mathematical space than S1–S4. Prior sections returned results in raw currency — expected profit in dollars. $G$ is a rate, and rates require a capital baseline to normalise against. This necessitates the introduction of a new variable $C$, defined fresh here rather than retrofitted into earlier sections, because S1–S4 did not require it. The distinction is intentional and clean.
+
+### Variables
+
+Building on all variables from Sections 1–4, we introduce one new variable:
+
+- $C$ — total trading capital in currency. This is your full account size, not the amount deployed per trade.
+
+We also redefine $S$ in the context of $G$:
+
+- $S$ — position size as a decimal fraction of $C$, where $S \in (0, 1)$. For example, $S = 0.10$ means 10% of capital is deployed per trade. The actual currency amount deployed is therefore $S \cdot C$.
+
+This redefinition does not contradict S1–S4, where $S$ was treated as a raw currency amount for simplicity. In those sections, $S$ was a concrete dollar figure because the output was also in dollars. Here, $S$ becomes a fraction because the output is a rate. Both usages are consistent within their respective mathematical contexts.
+
+### Derivation of G
+
+$G$ is constructed from three components, each representing a distinct force acting on your capital.
+
+**Component 1 — Base growth rate**
+
+The first component is simply your expected profit per trade $\rho$ from Section 2, normalised by total capital $C$:
+
+$$G_1 = \frac{\rho}{C} = \frac{(\omega \cdot S \cdot C \cdot L \cdot \bar{R}) - ((1 - \omega) \cdot S \cdot C \cdot L) - (f_e + f_x) \cdot S \cdot C \cdot L}{C}$$
+
+This is the raw edge of your strategy as a fraction of capital. Note that fees are already embedded here as the third term in the numerator — they reduce $G_1$ directly. A strategy must generate enough edge to clear fees before $G_1$ is even positive.
+
+This component is the special case of $G$ when $\sigma = 0$ and $\sigma_\omega = 0$ — perfect certainty, no volatility. In that idealized world, $G = G_1 = \frac{\rho}{C}$.
+
+**Component 2 — Volatility drag**
+
+The second component penalises $G$ for the variance of per-trade outcomes. As established in Section 3, compounding is multiplicative — a 50% loss requires a 100% gain to recover. Volatility therefore destroys geometric growth even when arithmetic EV is positive.
+
+The penalty is derived from log-normal growth theory, where the geometric mean return is approximated as the arithmetic mean minus half the variance, normalised by capital squared:
+
+$$G_2 = -\frac{\sigma^2}{2C^2}$$
+
+A larger $\sigma$ — a more chaotic strategy — incurs a larger penalty. This term is always negative or zero, never positive. It is a pure cost.
+
+**Component 3 — Win rate uncertainty drag**
+
+The third component penalises $G$ for uncertainty in the win rate estimate $\bar{\omega}$. As established in Section 4, $\sigma_\omega$ measures how much the true win rate could plausibly deviate from the backtested estimate. This uncertainty propagates into $\rho$ because $\omega$ directly determines the balance between winning and losing trades.
+
+The sensitivity of $\rho$ to changes in $\omega$ is the total P&L swing per trade — the amount gained on a win plus the amount lost on a loss:
+
+$$\Delta = S \cdot C \cdot L \cdot (\bar{R} + 1)$$
+
+Here $\bar{R}$ is the reward multiplier on a win and $1$ represents the full loss of the deployed amount on a loss. The larger this swing, the more damaging win rate uncertainty becomes. The penalty is:
+
+$$G_3 = -\frac{\sigma_\omega^2 \cdot (S \cdot C \cdot L \cdot (\bar{R} + 1))^2}{2C^2}$$
+
+Like $G_2$, this term is always negative or zero. It is also a pure cost.
+
+### Definition
+
+Combining all three components, the Universal Growth Rate is:
+
+$$\boxed{G = \frac{(\omega \cdot S \cdot C \cdot L \cdot \bar{R}) - ((1 - \omega) \cdot S \cdot C \cdot L) - (f_e + f_x) \cdot S \cdot C \cdot L}{C} - \frac{\sigma^2}{2C^2} - \frac{\sigma_\omega^2 \cdot (S \cdot C \cdot L \cdot (\bar{R} + 1))^2}{2C^2}}$$
+
+This formula is intentionally left unsimplified so that each term remains directly traceable to its origin in S1–S4, and so that it can be implemented directly in code by substituting values left to right.
+
+$G$ is expressed as a decimal. A result of $0.03$ means your capital grows by approximately 3% per trade on average. A result of $-0.01$ means your capital erodes by approximately 1% per trade on average, compounded.
+
+### How to Use G
+
+$G$ is a strategy feasibility metric, not a prediction. It does not tell you what will happen on any individual trade — $\tilde{\rho}$ from Section 4 handles that. It tells you the long-run trajectory of your capital if you run this strategy repeatedly.
+
+**The threshold that matters is $G = 0$:**
+
+- $G > 0$ — the strategy is feasible. Your capital grows on average per trade after accounting for all costs and uncertainties. A higher $G$ indicates a stronger, more robust strategy.
+- $G = 0$ — the strategy is breakeven. Your edge is exactly cancelled by fees, volatility drag, and win rate uncertainty drag combined. Not worth running.
+- $G < 0$ — the strategy is not feasible. Your capital erodes over time. Critically, this can occur even when $\rho > 0$ — a strategy with positive expected profit per trade can still destroy capital if volatility or win rate uncertainty is large enough relative to the edge.
+
+This last case is the most important insight of the paper. A positive $\rho$ is a necessary but not sufficient condition for a viable strategy. $G > 0$ is the sufficient condition.
+
+**Practical usage:**
+
+1. Run a backtest and extract $\bar{\omega}$, $n$, $\sigma$, $\bar{R}$, $S$, $L$, $f_e$, $f_x$
+2. Define your total capital $C$
+3. Derive $\sigma_\omega = \sqrt{\frac{\bar{\omega}(1-\bar{\omega})}{n}}$
+4. Plug all values into $G$
+5. If $G > 0$, the strategy clears the feasibility threshold. If $G \leq 0$, revise the strategy parameters or collect more backtest data to tighten $\sigma_\omega$
+
+### Example
+
+Using consistent parameters throughout:
+- $\bar{\omega} = 0.60$, $n = 30$ trades
+- $\bar{R} = 2$, $S = 0.10$, $C = \$1000$, $L = 2$
+- $f_e = 0.002$, $f_x = 0.002$
+- Backtest $\sigma = \$15$
+
+First, derive $\sigma_\omega$:
+
+$$\sigma_\omega = \sqrt{\frac{0.60 \cdot 0.40}{30}} \approx 0.0894$$
+
+Now compute each component:
+
+$$G_1 = \frac{(0.60 \cdot 0.10 \cdot 1000 \cdot 2 \cdot 2) - (0.40 \cdot 0.10 \cdot 1000 \cdot 2) - (0.004 \cdot 0.10 \cdot 1000 \cdot 2)}{1000}$$
+$$G_1 = \frac{240 - 80 - 0.8}{1000} = \frac{159.2}{1000} = 0.1592$$
+
+$$G_2 = -\frac{15^2}{2 \cdot 1000^2} = -\frac{225}{2000000} = -0.0001125$$
+
+$$G_3 = -\frac{0.0894^2 \cdot (0.10 \cdot 1000 \cdot 2 \cdot 3)^2}{2 \cdot 1000^2} = -\frac{0.00799 \cdot 360000}{2000000} \approx -0.001438$$
+
+$$G = 0.1592 - 0.0001125 - 0.001438 \approx 0.1577$$
+
+The strategy returns approximately $15.77\%$ capital growth per trade. $G > 0$, so it clears the feasibility threshold comfortably.
+
+Now observe what happens with a poorly backtested strategy — same parameters but $n = 10$ trades:
+
+$$\sigma_\omega = \sqrt{\frac{0.60 \cdot 0.40}{10}} \approx 0.1549$$
+
+$$G_3 = -\frac{0.1549^2 \cdot 360000}{2000000} = -\frac{0.02399 \cdot 360000}{2000000} \approx -0.004318$$
+
+$$G \approx 0.1592 - 0.0001125 - 0.004318 \approx 0.1548$$
+
+Still positive here, but the win rate uncertainty drag has grown threefold. For a strategy with a thinner edge, a 10-trade backtest could easily push $G$ below zero — making it appear feasible on paper while being demonstrably unviable under scrutiny.
+
+And one final check, let's consider $n = 10000$ trades, same parameters:
+
+$$\sigma_\omega = \sqrt{\frac{0.60 \cdot 0.40}{10000}} \approx 0.0049$$
+
+$$G_3 = -\frac{0.0049^2 \cdot 360000}{2000000} = -\frac{0.00002401 \cdot 360000}{2000000} \approx -0.00000432$$
+
+$$G \approx 0.1592 - 0.0001125 - 0.00000432 \approx 0.1591$$
+
+Similar result to $n = 30$, just with much smaller winrate uncertainty drag.
+This is why backtest sample size is not a technicality. It is a direct input to $G$.
