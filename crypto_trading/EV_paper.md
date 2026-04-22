@@ -98,7 +98,7 @@ $$\rho = \$120 - \$40 - \$0.4$$
 $$\rho = \$80 - \$0.4$$
 $$\rho = \$79.6$$
 
-Compared to our initial UM result, we have achieved a result that while only $0,4 smaller, imagine what this could do at a strategy trading with $50 million. The fee would be $400,000. Astronomical. Further sections will further demonstrate how to rigorously account for fees and fee drag.
+Compared to our initial UM result, we have achieved a result that while only $\$0,4$ smaller, imagine what this could do at a strategy trading with $\$50,000,000$. The fee would be $\$400,000$. Astronomical. Further sections will further demonstrate how to rigorously account for fees and fee drag.
 
 ## 3. EV Volatile Model
 
@@ -375,3 +375,9 @@ $$G \approx 0.1592 - 0.0001125 - 0.00000432 \approx 0.1591$$
 
 Similar result to $n = 30$, just with much smaller winrate uncertainty drag.
 This is why backtest sample size is not a technicality. It is a direct input to $G$.
+
+## 6. Conclusion
+
+We have managed to construct a unified mathematical framework for evaluating the long-term viability of a crypto trading strategy, all from a simple EV per trade formula not accounting for fees.
+
+If you'd like to try to get your $G$ with some backtested data, but don't want to type the lengthy formula by hand, you can use [this script](G_script.py) right here. Simply open it, adjust parameters, run `python G_script.py` in the directory the script is located in, and you will see your $G$.
