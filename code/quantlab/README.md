@@ -6,7 +6,7 @@
 Quantlab is an open-source backtesting engine. It's part of a series of projects designed to help me get a job in the quantitative analysis industry.
 
 ### Features
-* Sourcing data from the `yfinance` library
+* Sourcing data from Yahoo Finance
 * Defining custom strategies and indicators
 * Backtesting said strategies
 * Analyzing strategy feasibility, position sizing and various risk-related metrics
@@ -27,3 +27,9 @@ Create a virtual environment with `python -m venv venv`, then run `source venv/b
 
 ![Dashboard Top](res/example_top.png)
 ![Dashboard Bottm](res/examplebottoms.png)
+
+### Future Plans
+
+* Desktop app built in Rust with Python layers to handle data downloads
+* Implement live execution mechanics for crypto and stocks
+* Node-based strategy builder

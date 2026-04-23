@@ -1,8 +1,3 @@
-## Universal Growth Rate Model
-
-**Author:** Fedor Palko\
-**Date started:** 21/04/2026
-
 ## Thesis
 
 In this paper I hope to explore and build upon a standalone and simple EV per trade formula, where I eventually hope to define $G$ as the standard ultimate universal growth rate model - basically the % of which your stake will grow each trade. $G$ accounts for compounding, fee drag, volatility and win rate uncertainty. I want to do it in a way where it is both simple enough to be understood by anyone and yet complex enough to be statistically sound and useful for actual trading strategies, including my own.
