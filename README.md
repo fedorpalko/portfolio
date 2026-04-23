@@ -6,5 +6,6 @@
 - [**Math Compendium**](math/COMPENDIUM.md)
 - [**Crypto Trading**](crypto_trading/index.md)
 
+## About me
 
-
+I'm currently a high school student with a strong interest in quantitative finance, specifically research, software development and day trading. I've started this portfolio as a way of compiling all of my related works and creations into one unified repository anyone can navigate and find some interesting pieces!
