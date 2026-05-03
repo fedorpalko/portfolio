@@ -36,3 +36,7 @@ Where:
 - $G_3$: Win rate uncertainty drag penalty.
 
 If $G > 0$, the strategy is mathematically viable over the long run.
+
+## Showcase
+
+![Tradelab Screenshot](res/tradelab.svg)
