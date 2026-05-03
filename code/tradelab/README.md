@@ -16,14 +16,14 @@ Tradelab is a Terminal User Interface (TUI) application designed to determine tr
 2. Create and activate a virtual environment.
 3. Install dependencies:
    ```bash
-   pip install -r requirements.txt
+   venv/bin/pip install -r requirements.txt
    ```
 
 ## Usage
 
 Run the application using:
 ```bash
-python src/main.py
+venv/bin/python src/main.py
 ```
 
 ## Mathematical Foundation
