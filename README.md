@@ -5,6 +5,7 @@
 - [**Code Projects**](code/PROJECTS.md)
 - [**Math Compendium**](math/COMPENDIUM.md)
 - [**Crypto Trading**](crypto_trading/index.md)
+- [**Academic Accolades**](personal/ACCOLADES.md)
 
 ## About me
 
