@@ -1,11 +1,13 @@
-import socket
 import json
 import time
 import os
+import pandas as pd
+import socket
 from alpaca.data.live import StockDataStream
 from alpaca.data.historical import StockHistoricalDataClient
 from alpaca.data.requests import StockBarsRequest
 from alpaca.data.timeframe import TimeFrame
+from alpaca.data.enums import DataFeed
 from strategy import SMACrossoverStrategy
 
 def load_config():
@@ -64,7 +66,8 @@ class LivenodeBot:
         request_params = StockBarsRequest(
             symbol_or_symbols=self.symbol,
             timeframe=TimeFrame.Minute,
-            start=pd.Timestamp.now() - pd.Timedelta(hours=2)
+            start=pd.Timestamp.now(tz='UTC') - pd.Timedelta(hours=2),
+            feed=DataFeed.IEX
         )
         bars = self.data_client.get_stock_bars(request_params)
         for bar in bars[self.symbol]:
@@ -76,6 +79,5 @@ class LivenodeBot:
 
 if __name__ == "__main__":
     import asyncio
-    import pandas as pd
     bot = LivenodeBot("AAPL") # Default to AAPL
     bot.run()
