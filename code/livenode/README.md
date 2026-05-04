@@ -1,4 +1,4 @@
-# Livenode 🚀
+# Livenode
 
 Livenode is a minimal, hybrid trading bot architecture designed for Alpaca Paper Trading. It leverages the speed and robustness of **C++** for order execution and the flexibility of **Python** for signal generation and strategy logic.
 
