@@ -1,7 +1,7 @@
 ## Thesis
 
 **Gamma ($\gamma$)** is a trading strategy grounded and built upon the rigorous [Universal Growth Rate Model](../EV_paper.md). The strategy is designed for portfolio managers and institutions that seek to use large amounts of capital to generate a steady return with minimal drawdowns and the ability to benefit from both up and down market movements via trend following on various large cryptocurrency pairs.
-
+ 
 It utilizes integration and $G$ to find minimal values of win rate, reward and volatility for an acceptable return rate and growth factor and therefore determine whether the strategy is mathematically viable.
 
 ## Development Plan
