@@ -1,0 +1,9 @@
+{
+    "strategy": "sma_crossover",
+    "pairlist": ["AAPL", "MSFT", "TSLA"],
+    "timeframe": "1Min",
+    "strategy_params": {
+        "fast_window": 20,
+        "slow_window": 50
+    }
+}

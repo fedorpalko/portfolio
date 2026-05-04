@@ -68,8 +68,8 @@ You can run a timed integration test to verify the connection between the engine
    ```
 This will open an AAPL position, wait 20 seconds, and then close it automatically.
 
-## Next Steps
+## Configuration
 
-- Modify the strategy to suit your needs better
+You can configure the bot in the `settings.json` file, here you can tweak the available pairlist, candlestick timeframe, as well as the strategy to be used. The default is an SMA Crossover algorithm, but you can switch to some of the examples, or develop your own.
 
 
