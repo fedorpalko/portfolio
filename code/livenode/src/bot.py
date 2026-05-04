@@ -1,9 +1,14 @@
 import json
 import time
 import os
+import sys
 import pandas as pd
 import socket
 import importlib
+
+# Ensure project root is in path for dynamic strategy imports
+sys.path.append(os.getcwd())
+
 from alpaca.data.live import StockDataStream
 from alpaca.data.historical import StockHistoricalDataClient
 from alpaca.data.requests import StockBarsRequest
