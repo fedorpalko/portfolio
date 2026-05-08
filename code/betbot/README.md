@@ -7,5 +7,8 @@ all combine to provide a comprehensive piece of advice.
 
 ## Features
 - **Kelly Criterion** integration for smarter calculations regarding bet sizing
-- Support for 1x2 betting, Asian handicap
+- Support for 1x2 betting
 - Useful for simple theory
+
+## Future ambitions
+- Building a prediction model
