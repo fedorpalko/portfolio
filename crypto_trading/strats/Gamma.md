@@ -186,7 +186,7 @@ If backtesting yields insufficient trades for a statistically meaningful $\sigma
 
 ## 4. Implementing the Strategy
 
-This one really doesn't warrant its own section, but you can find the code right [here](Gamma.py).
+This one really doesn't warrant its own section, but you can find the code right [here](py/Gamma.py).
 
 ## 5. Backtesting the Strategy
 

@@ -11,4 +11,4 @@ all combine to provide a comprehensive piece of advice.
 - Useful for simple theory
 
 ## Future ambitions
-- Building a prediction model
+- Building a prediction model (note: i can't seem to find a free source, so this project will be abandoned until I do)
