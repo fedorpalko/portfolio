@@ -13,8 +13,8 @@ Strategies are grounded to specific mathematical standards and quotas that they 
 
 I have also written a few mathematical papers related to day trading.
 
-[**Universal Growth Rate Model**](EV_paper.md) - This paper introduces the mathematical framework for evaluating and comparing trading strategies.
+[**Universal Growth Rate Model**](papers/EV_paper.md) - This paper introduces the mathematical framework for evaluating and comparing trading strategies.
 
 ### Tools
 
-The [**Viability Calculator**](G_script.py) Python script allows you to find your $G$ based on inputted strategy parameters based on the universal growth rate model.
+The [**Viability Calculator**](tools/G_script.py) Python script allows you to find your $G$ based on inputted strategy parameters based on the universal growth rate model.
