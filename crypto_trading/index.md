@@ -8,10 +8,6 @@ It includes strategy design theorems and theses.
 Strategies are grounded to specific mathematical standards and quotas that they need to pass in order to be standard-certified. A key criterion is $G$, which is defined in the Universal Growth Rate Model paper found below.
 
 [**Gamma ($\gamma$)**](strats/Gamma.md) is a trading strategy designed for institutions to grow capital with consistently low drawdown using trend following.\
-[**Delta ($\delta$)**](strats/Delta.md) is a strategy also designed for institutions to grow capital, but using more risk in favor of larger potential returns. PENDING\
-[**Epsilon ($\epsilon$)**](strats/Epsilon.md) is a strategy not designed for institutions, but rather for individuals to grow small accounts moderately quickly using trend following. PENDING\
-[**Iota ($\iota$)**](strats/Iota.md) is an ML-powered mean-reversion algorithm designed for individuals and institutions alike, growing any sort of capital consistently and moderately quickly. PENDING\
-[**Theta ($\theta$)**](strats/Theta.md) is an astronomically high-risk, high-reward breakout strategy designed for individuals who want to grow their accounts as fast as possible while not caring about risk. PENDING
 
 ### Papers
 
