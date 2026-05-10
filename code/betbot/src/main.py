@@ -11,7 +11,7 @@ def main():
     odds2 = 2.14
 
     print(
-        "BetBot says: Bet on:",
+        "BetBot says:",
         kelly_bet_sizing_simple(bankroll, prob1, probx, prob2, odds1, oddsx, odds2),
     )
 

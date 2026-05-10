@@ -24,4 +24,4 @@ def kelly_bet_sizing_simple(
         return {}  # no edge on anything
 
     bet_size = best_outcome[1] * fractional_kelly * bankroll
-    return {best_outcome[0]: bet_size}
+    return {best_outcome[0]: f"${bet_size:.2f}"}
