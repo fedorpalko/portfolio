@@ -6,9 +6,6 @@
 
 1. Core strategy definition, parameter choosing
 2. Strategy implementation (theoretical)
-3. Strategy backtesting, analysis
-4. Strategy validation via $G$
-5. Conclusion
 
 ## 1. Core strategy definition, parameter choosing
 
@@ -79,18 +76,3 @@ Zeta will be a mean-reversion strategy, utilizing quick changes in volatility an
 - Price closes below the lower Bollinger Band (long only)
 - Price closes above the upper Bollinger Band (short only)
 
-## 3. Strategy backtesting, analysis
-
-For this section, we performed multiple backtests on **Binance Futures** in the following periods:
-
-| Date Range | Condition | PnL (%) | Sharpe | Sortino | Max Drawdown (%) | $\bar{\omega}$
-|-----------|-----------|--------|---------|------------------|----------------|----------|
-| `20260101-20260301` | Choppy | 
-
-## 4. Strategy validation via $G$
-
-> To be done
-
-## 5. Conclusion
-
-> To be done

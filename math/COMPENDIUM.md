@@ -11,5 +11,3 @@ This compendium archives my journey through mathematics, with a particular focus
 
 - [**Problem 001 - The Strange Chess Game**](MO/001.md)
 
-### International Math Olympiad Problems
-*Pending...*
