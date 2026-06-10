@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '.'))
 from backtesting import backtest_strategy, format_summary, format_metrics_dataframe
 from risk import format_trades_list
 from optimizer import run_optimization
-from strategy import DEFAULT_PARAM_RANGES
+from strategy import DEFAULT_PARAM_RANGES, get_param_ranges
 
 class StreamlitLogCapture:
     def __init__(self):
@@ -56,12 +56,20 @@ config['fees_per_trade'] = st.sidebar.number_input("Fees per Trade", value=confi
 
 
 st.sidebar.header("Strategy Parameters")
-# This part is strategy specific, for now we use the default from strategy.py
-param_ranges = DEFAULT_PARAM_RANGES
+STRATEGY_LABELS = {
+    'adx_rsi_ema': 'ADX / RSI / EMA',
+    'gamma': 'Gamma (TEMA + ADX + CMO)',
+}
+strategy_name = st.sidebar.selectbox(
+    "Strategy",
+    options=list(STRATEGY_LABELS.keys()),
+    format_func=lambda k: STRATEGY_LABELS[k],
+    key="strategy_selector",
+)
+param_ranges = get_param_ranges(strategy_name)
 params = {}
 for name, p_range in param_ranges.items():
-    # Use a unique key for each slider to prevent conflicts
-    params[name] = st.sidebar.slider(name, min_value=p_range.start, max_value=p_range.stop -1, value=p_range.start, key=f"strategy_param_{name}")
+    params[name] = st.sidebar.slider(name, min_value=p_range.start, max_value=p_range.stop - 1, value=p_range.start, key=f"strategy_param_{name}")
 
 
 st.sidebar.header("Optimization Settings")
@@ -91,9 +99,10 @@ if st.button("Run Backtest"):
                 start_date=config['start_date'],
                 end_date=config['end_date'],
                 initial_capital=config['initial_capital'],
-                fees_per_trade=config['fees_per_trade'], # Pass fees_per_trade
+                fees_per_trade=config['fees_per_trade'],
                 params=params,
-                show_plot=True
+                show_plot=True,
+                strategy_name=strategy_name,
             )
         st.session_state.backtest_fig = fig
         st.session_state.backtest_metrics = metrics
@@ -123,7 +132,9 @@ if config['enable_optimization']:
                     ticker=config['ticker'],
                     start_date=config['start_date'],
                     end_date=config['end_date'],
-                    initial_capital=config['initial_capital']
+                    initial_capital=config['initial_capital'],
+                    param_ranges=param_ranges,
+                    strategy_name=strategy_name,
                 )
                 if best_result:
                     st.session_state.backtest_fig = fig

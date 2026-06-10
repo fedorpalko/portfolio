@@ -4,15 +4,15 @@ import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from strategy import generate_signals
+from strategy import generate_signals, get_param_ranges
 from downloader import download_data
 from risk import calculate_risk_metrics, format_trades_list
 
 
-def _apply_signals_and_returns(df: pd.DataFrame, initial_capital: float, params: dict = None) -> pd.DataFrame:
+def _apply_signals_and_returns(df: pd.DataFrame, initial_capital: float, params: dict = None, strategy_name: str = 'adx_rsi_ema') -> pd.DataFrame:
     """Apply strategy signals to compute position, returns, and portfolio value."""
     if 'signal' not in df.columns:
-        df = generate_signals(df, params)
+        df = generate_signals(df, params, strategy_name=strategy_name)
 
     df = df.copy()
     df['position'] = df['signal'].shift(1).fillna(0).astype(int)
@@ -213,20 +213,21 @@ def backtest_strategy(initial_capital: float = 10000.0,
                       period: str = "1d",
                       show_plot: bool = True,
                       fees_per_trade: float = 0.0,
-                      params: dict = None) -> Tuple[pd.DataFrame, Dict[str, float], pd.DataFrame, Optional[plt.Figure]]:
+                      params: dict = None,
+                      strategy_name: str = 'adx_rsi_ema') -> Tuple[pd.DataFrame, Dict[str, float], pd.DataFrame, Optional[plt.Figure]]:
     """Run backtest and return (df, metrics, trades_df, and optional fig).
 
     Set `show_plot=True` to generate and return the cumulative returns plot.
     """
     # Download data for strategy
     df = download_data(ticker, start_date, end_date, period)
-    
+
     # Download data for benchmark (buy and hold)
     benchmark_df = df.copy() # The raw data is the benchmark
 
     # Run strategy logic
-    df = generate_signals(df, params)
-    df = _apply_signals_and_returns(df, initial_capital, params)
+    df = generate_signals(df, params, strategy_name=strategy_name)
+    df = _apply_signals_and_returns(df, initial_capital, params, strategy_name=strategy_name)
 
     # Extract trades and calculate all metrics
     trades_df = _extract_trades(df, initial_capital)
