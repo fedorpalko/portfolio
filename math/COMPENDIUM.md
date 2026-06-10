@@ -4,7 +4,7 @@ This compendium archives my journey through mathematics, with a particular focus
 
 ### Jane Street Problems
 
-- [**Problem 001 - Pyrknot's Planetary Parade**](JaneStreet/001.html)
+- [**Problem 001 - Pyrknot's Planetary Parade**](JaneStreet/001.md)
 
 ### National Math Olympiad Problems
 *Note: these problems are published by the Slovak MO institute, and thus originals are in Slovak; solutions and my rewrites are in English though.*

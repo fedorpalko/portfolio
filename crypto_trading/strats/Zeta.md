@@ -1,6 +1,6 @@
 ## Thesis
 
-**Zeta ($\zeta$)** is yet another trading strategy based on the [Universal Growth Rate Model](../EV_paper.md). This strategy is a mean-reversion strategy designed for medium-high market cap coins (think the top 20-30 coins, excluding the top 3 and stablecoins) that applies the universal model, but it doesn't base the entire strategy on it. Instead it utilizes it as a simple validator of whether it is viable, and it employs different models to generate a profit that is more substantial than Gamma, while compensating for that by requiring higher risk. It is no longer a strategy for retail traders that can use high capital to generate returns with small % of profits.
+**Zeta ($\zeta$)** is yet another trading strategy based on the [Universal Growth Rate Model](../papers/EV_paper.md). This strategy is a mean-reversion strategy designed for medium-high market cap coins (think the top 20-30 coins, excluding the top 3 and stablecoins) that applies the universal model, but it doesn't base the entire strategy on it. Instead it utilizes it as a simple validator of whether it is viable, and it employs different models to generate a profit that is more substantial than Gamma, while compensating for that by requiring higher risk. It is no longer a strategy for retail traders that can use high capital to generate returns with small % of profits.
 
 ## Table of Contents
 

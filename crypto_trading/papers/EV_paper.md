@@ -375,4 +375,4 @@ This is why backtest sample size is not a technicality. It is a direct input to 
 
 We have managed to construct a unified mathematical framework for evaluating the long-term viability of a crypto trading strategy, all from a simple EV per trade formula not accounting for fees.
 
-If you'd like to try to get your $G$ with some backtested data, but don't want to type the lengthy formula by hand, you can use [this script](G_script.py) right here. Simply open it, adjust parameters, run `python G_script.py` in the directory the script is located in, and you will see your $G$.
+If you'd like to try to get your $G$ with some backtested data, but don't want to type the lengthy formula by hand, you can use [this script](../tools/G_script.py) right here. Simply open it, adjust parameters, run `python G_script.py` in the directory the script is located in, and you will see your $G$.

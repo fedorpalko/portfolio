@@ -17,4 +17,4 @@ I have also written a few mathematical papers related to day trading.
 
 ### Tools
 
-The [**Viability Calculator**](tools/G_script.py) Python script allows you to find your $G$ based on inputted strategy parameters based on the universal growth rate model.
+The [**G Calculator**](tools/G_script.py) is a minimal standalone Python script for computing $G$ from raw strategy parameters — no dependencies required. For a full interactive experience with Monte Carlo simulation and Kelly sizing, see [**Tradelab**](../code/tradelab/README.md) in the code projects.
