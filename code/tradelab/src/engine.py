@@ -14,6 +14,7 @@ class StrategyParams:
     entry_fee: float  # f_e (as decimal, e.g. 0.001)
     exit_fee: float  # f_x
     position_size: float  # S (fraction of capital, 0 to 1)
+    trades_per_year: int = 52  # for CAGR projection
 
     def to_json(self):
         return json.dumps(asdict(self), indent=4)
@@ -63,6 +64,45 @@ class UniversalGrowthModel:
         adjusted_rr = p.reward_ratio - (p.entry_fee + p.exit_fee)
         kelly = (p.win_rate * adjusted_rr - (1 - p.win_rate)) / adjusted_rr
         return max(0.0, kelly)
+
+    @staticmethod
+    def breakeven_analysis(p: StrategyParams) -> Dict[str, float]:
+        """
+        Calculates the minimum win rate and minimum R:R for G to reach exactly zero,
+        holding all other parameters fixed. Drag terms (G2, G3) are computed at the
+        current parameter values and treated as constants in the inversion.
+        """
+        results = UniversalGrowthModel.calculate_g(p)
+        drag = -(results['g2'] + results['g3'])  # positive total drag
+
+        sl = p.position_size * p.leverage
+        fees = p.entry_fee + p.exit_fee
+
+        # G1 = drag  =>  sl * (omega * (R+1) - 1 - fees) = drag
+        # omega_min = (drag/sl + 1 + fees) / (R+1)
+        if sl > 0:
+            win_rate_min = (drag / sl + 1 + fees) / (p.reward_ratio + 1)
+            win_rate_min = float(np.clip(win_rate_min, 0.0, 1.0))
+        else:
+            win_rate_min = float('nan')
+
+        # G1 = drag  =>  sl * (omega * R - (1-omega) - fees) = drag
+        # R_min = (drag/sl + (1-omega) + fees) / omega
+        if p.win_rate > 0 and sl > 0:
+            rr_min = (drag / sl + (1 - p.win_rate) + fees) / p.win_rate
+            rr_min = float(max(0.0, rr_min))
+        else:
+            rr_min = float('nan')
+
+        win_rate_margin = p.win_rate - win_rate_min if not np.isnan(win_rate_min) else float('nan')
+        rr_margin = p.reward_ratio - rr_min if not np.isnan(rr_min) else float('nan')
+
+        return {
+            'win_rate_min': win_rate_min,
+            'rr_min': rr_min,
+            'win_rate_margin': win_rate_margin,
+            'rr_margin': rr_margin,
+        }
 
     @staticmethod
     def monte_carlo_simulation(p: StrategyParams, num_paths: int = 100, num_trades: int = 500, ruin_threshold: float = 0.1) -> Dict:

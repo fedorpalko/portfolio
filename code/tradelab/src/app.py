@@ -40,7 +40,8 @@ class TradelabApp(App):
         std_dev=15.0,
         entry_fee=0.001,
         exit_fee=0.001,
-        position_size=0.1
+        position_size=0.1,
+        trades_per_year=52,
     ))
 
     BINDINGS = [
@@ -74,7 +75,9 @@ class TradelabApp(App):
                 yield Input(value=str(self.params.position_size), id="input-s", placeholder="0.1")
                 yield Label("Fees (Entry + Exit %)")
                 yield Input(value=str(self.params.entry_fee + self.params.exit_fee), id="input-fees", placeholder="0.002")
-                
+                yield Label("Trades Per Year (CAGR)")
+                yield Input(value=str(self.params.trades_per_year), id="input-tpy", placeholder="52")
+
                 yield Button("APPLY KELLY SIZE (K)", variant="primary", id="btn-kelly")
                 yield Label("\n[Arrow keys to navigate]", classes="metric-title")
 
@@ -88,6 +91,10 @@ class TradelabApp(App):
                 with Horizontal():
                     yield MetricCard("RISK OF RUIN (RoR)", id="metric-ror")
                     yield MetricCard("EXPECTED CAGR", id="metric-cagr")
+
+                with Horizontal():
+                    yield MetricCard("BREAKEVEN ω", id="metric-be-win")
+                    yield MetricCard("BREAKEVEN R:R", id="metric-be-rr")
 
                 yield Static("VIABILITY UNKNOWN", id="viability-badge")
                 
@@ -144,6 +151,7 @@ class TradelabApp(App):
             sigma = float(self.query_one("#input-sigma", Input).value)
             fees = float(self.query_one("#input-fees", Input).value)
             s = float(self.query_one("#input-s", Input).value)
+            tpy = int(self.query_one("#input-tpy", Input).value)
 
             self.params = StrategyParams(
                 win_rate=win_rate,
@@ -154,7 +162,8 @@ class TradelabApp(App):
                 std_dev=sigma,
                 entry_fee=fees / 2.0,
                 exit_fee=fees / 2.0,
-                position_size=s
+                position_size=s,
+                trades_per_year=max(1, tpy),
             )
         except (ValueError, TypeError):
             pass
@@ -200,9 +209,26 @@ class TradelabApp(App):
             is_positive=(ror < 0.05)
         )
         
-        # CAGR approx from G
-        cagr = (1 + g_val)**250 - 1
-        self.query_one("#metric-cagr", MetricCard).update_value(f"{cagr:.1%}")
+        # CAGR from G and user-specified trades_per_year
+        cagr = (1 + g_val)**self.params.trades_per_year - 1
+        self.query_one("#metric-cagr", MetricCard).update_value(f"{cagr:.1%}", is_positive=(cagr > 0))
+
+        # Breakeven analysis
+        be = UniversalGrowthModel.breakeven_analysis(self.params)
+        win_min = be['win_rate_min']
+        win_margin = be['win_rate_margin']
+        win_sign = "+" if win_margin >= 0 else ""
+        self.query_one("#metric-be-win", MetricCard).update_value(
+            f"{win_min:.1%}  ({win_sign}{win_margin:.1%})",
+            is_positive=(win_margin >= 0)
+        )
+        rr_min = be['rr_min']
+        rr_margin = be['rr_margin']
+        rr_sign = "+" if rr_margin >= 0 else ""
+        self.query_one("#metric-be-rr", MetricCard).update_value(
+            f"{rr_min:.2f}  ({rr_sign}{rr_margin:.2f})",
+            is_positive=(rr_margin >= 0)
+        )
 
         # Update Sparkline
         sample_path = sim["paths"][0]
@@ -233,6 +259,7 @@ class TradelabApp(App):
                 self.query_one("#input-sigma", Input).value = str(self.params.std_dev)
                 self.query_one("#input-s", Input).value = str(self.params.position_size)
                 self.query_one("#input-fees", Input).value = str(self.params.entry_fee + self.params.exit_fee)
+                self.query_one("#input-tpy", Input).value = str(self.params.trades_per_year)
             except Exception:
                 pass
 

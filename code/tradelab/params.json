@@ -7,5 +7,6 @@
     "std_dev": 15.0,
     "entry_fee": 0.001,
     "exit_fee": 0.001,
-    "position_size": 0.3994
+    "position_size": 0.3994,
+    "trades_per_year": 52
 }
