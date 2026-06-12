@@ -1,6 +1,0 @@
-{
-    "market_cap_limit": 500,
-    "watchlist": ["AAPL", "TSLA", "MSFT", "NVDA", "AMD"],
-    "show_count": 10,
-    "update_interval": 60
-}
