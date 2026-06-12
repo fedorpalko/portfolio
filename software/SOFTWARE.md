@@ -8,3 +8,5 @@ Welcome to the **Software** section. Here is a curated list of every coding proj
 ### TUI/CLI Applications
 ### Games
 ### Scripts
+
+[StratVal](scripts/stratval.py) is a simple script for validating trading strategies using the custom $G$ framework, as described [here](../finance/papers/UGRM.md).
