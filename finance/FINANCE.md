@@ -4,6 +4,8 @@ Welcome to the **Finance** portal. Any relevant sub-sections or specific works a
 
 ### Papers
 
+The [Universal Growth Rate Model](papers/UGRM.md) describes a simple $G$ metric that allows to validate trading strategies and see their mathematical viability and strength with a single number.
+
 ### Algorithms
 
 ### Trading Experience
