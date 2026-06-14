@@ -1,4 +1,4 @@
-"""WSLAB entrypoint. Launches the Textual app."""
+"""WSLAB entrypoint. Launches the Rich console app."""
 
 import sys
 from pathlib import Path

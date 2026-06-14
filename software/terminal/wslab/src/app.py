@@ -1,9 +1,9 @@
-"""WSLAB Textual application.
+"""WSLAB console application (Rich).
 
-Single-screen TUI: a sidebar selects between the Backtest, Optimize, Results
-and Strategies panels (a ContentSwitcher swaps the main area). Long-running
-work — data download, backtests, optimization, charting — runs in thread
-workers so the UI stays responsive.
+A menu-driven interactive terminal app built with Rich. The main loop offers
+Backtest / Optimize / Results / Strategies actions; each walks the user through
+prompts, runs the work, and renders results as Rich tables and panels. The
+engine, strategy and optimization layers are UI-agnostic and shared as-is.
 """
 
 from __future__ import annotations
@@ -12,21 +12,19 @@ import webbrowser
 from datetime import datetime
 from pathlib import Path
 
-from textual import work
-from textual.app import App, ComposeResult
-from textual.containers import Horizontal, Vertical, VerticalScroll
-from textual.widgets import (
-    Button,
-    ContentSwitcher,
-    DataTable,
-    Footer,
-    Header,
-    Input,
-    Label,
-    ProgressBar,
-    Select,
-    Static,
+from rich import box
+from rich.console import Console
+from rich.panel import Panel
+from rich.progress import (
+    BarColumn,
+    MofNCompleteColumn,
+    Progress,
+    TextColumn,
+    TimeElapsedColumn,
 )
+from rich.prompt import Confirm, FloatPrompt, IntPrompt, Prompt
+from rich.table import Table
+from rich.text import Text
 
 from engine.backtest import run_backtest
 from engine.data import DataError, fetch
@@ -38,488 +36,284 @@ ROOT_DIR = SRC_DIR.parent
 STRATEGIES_DIR = ROOT_DIR / "strategies"
 OUTPUT_DIR = ROOT_DIR / "output"
 
-# Optimize-metric selector: (label, internal metric name).
-METRIC_OPTIONS = [
-    ("Sharpe Ratio", "Sharpe Ratio"),
-    ("Return %", "Return [%]"),
-    ("Max Drawdown %", "Max Drawdown [%]"),
-]
+# Optimize-metric selector: label -> internal metric name.
+METRIC_OPTIONS = {
+    "Sharpe Ratio": "Sharpe Ratio",
+    "Return %": "Return [%]",
+    "Max Drawdown %": "Max Drawdown [%]",
+}
 
 
-def coerce_param(raw: str, default):
-    """Coerce a text input to the type of the parameter's default value."""
-    raw = (raw or "").strip()
-    if isinstance(default, bool):
-        return raw.lower() in ("1", "true", "yes", "y", "on")
-    if isinstance(default, int):
-        return int(float(raw))
-    if isinstance(default, float):
-        return float(raw)
-    return raw
-
-
-# --------------------------------------------------------------------------
-# Panels
-# --------------------------------------------------------------------------
-class BacktestPanel(VerticalScroll):
-    def __init__(self, strategies: dict, **kwargs) -> None:
-        super().__init__(**kwargs)
-        self.strategies = strategies
-        self._built_for: str | None = None
-
-    def compose(self) -> ComposeResult:
-        first = next(iter(self.strategies), Select.BLANK)
-        yield Label("Backtest", classes="panel-title")
-        yield Label("Ticker")
-        yield Input(value="AAPL", placeholder="AAPL", id="bt-ticker")
-        with Horizontal(classes="row"):
-            with Vertical():
-                yield Label("Start (YYYY-MM-DD)")
-                yield Input(value="2020-01-01", id="bt-start")
-            with Vertical():
-                yield Label("End (YYYY-MM-DD)")
-                yield Input(value="2023-01-01", id="bt-end")
-        yield Label("Strategy")
-        yield Select(
-            [(name, name) for name in self.strategies],
-            value=first,
-            allow_blank=False,
-            id="bt-strategy",
-        )
-        yield Label("Parameters", classes="section")
-        yield Vertical(id="bt-params")
-        with Horizontal(classes="row"):
-            with Vertical():
-                yield Label("Cash")
-                yield Input(value="10000", id="bt-cash")
-            with Vertical():
-                yield Label("Commission")
-                yield Input(value="0.002", id="bt-commission")
-        yield Button("Run Backtest", id="run-backtest", variant="primary")
-        yield Static("", id="bt-status", classes="status")
-
-    async def on_mount(self) -> None:
-        if self.strategies:
-            await self.build_params(next(iter(self.strategies)))
-
-    async def on_select_changed(self, event: Select.Changed) -> None:
-        if event.select.id == "bt-strategy" and event.value is not Select.BLANK:
-            await self.build_params(event.value)
-
-    async def build_params(self, strat_name: str) -> None:
-        if strat_name == self._built_for:
-            return
-        self._built_for = strat_name
-        container = self.query_one("#bt-params", Vertical)
-        await container.remove_children()
-        cls = self.strategies.get(strat_name)
-        if not cls:
-            return
-        widgets = []
-        for pname, default in cls.get_params().items():
-            widgets.append(Label(pname))
-            widgets.append(Input(value=str(default), id=f"param-{pname}"))
-        await container.mount(*widgets)
-
-    def collect(self) -> dict:
-        strat = self.query_one("#bt-strategy", Select).value
-        if strat is Select.BLANK:
-            raise ValueError("Select a strategy.")
-        cls = self.strategies[strat]
-        params = {
-            pname: coerce_param(
-                self.query_one(f"#param-{pname}", Input).value, default
-            )
-            for pname, default in cls.get_params().items()
-        }
-        return {
-            "ticker": self.query_one("#bt-ticker", Input).value.strip(),
-            "start": self.query_one("#bt-start", Input).value.strip(),
-            "end": self.query_one("#bt-end", Input).value.strip(),
-            "strat_name": strat,
-            "params": params,
-            "cash": float(self.query_one("#bt-cash", Input).value),
-            "commission": float(self.query_one("#bt-commission", Input).value),
-        }
-
-    def set_status(self, text: str) -> None:
-        self.query_one("#bt-status", Static).update(text)
-
-
-class OptimizePanel(VerticalScroll):
-    def __init__(self, strategies: dict, **kwargs) -> None:
-        super().__init__(**kwargs)
-        self.strategies = strategies
-        self._built_for: str | None = None
-
-    def compose(self) -> ComposeResult:
-        first = next(iter(self.strategies), Select.BLANK)
-        yield Label("Optimize", classes="panel-title")
-        yield Label("Ticker")
-        yield Input(value="AAPL", placeholder="AAPL", id="opt-ticker")
-        with Horizontal(classes="row"):
-            with Vertical():
-                yield Label("Start (YYYY-MM-DD)")
-                yield Input(value="2020-01-01", id="opt-start")
-            with Vertical():
-                yield Label("End (YYYY-MM-DD)")
-                yield Input(value="2023-01-01", id="opt-end")
-        yield Label("Strategy")
-        yield Select(
-            [(name, name) for name in self.strategies],
-            value=first,
-            allow_blank=False,
-            id="opt-strategy",
-        )
-        yield Label("Parameter ranges", classes="section")
-        yield Vertical(id="opt-params")
-        with Horizontal(classes="row"):
-            with Vertical():
-                yield Label("Metric to maximize")
-                yield Select(METRIC_OPTIONS, value="Sharpe Ratio",
-                             allow_blank=False, id="opt-metric")
-            with Vertical():
-                yield Label("Iterations")
-                yield Input(value="50", id="opt-iterations")
-        with Horizontal(classes="row"):
-            with Vertical():
-                yield Label("Cash")
-                yield Input(value="10000", id="opt-cash")
-            with Vertical():
-                yield Label("Commission")
-                yield Input(value="0.002", id="opt-commission")
-        yield Button("Run Optimization", id="run-optimize", variant="primary")
-        yield ProgressBar(total=100, show_eta=False, id="opt-progress")
-        yield Static("", id="opt-status", classes="status")
-
-    async def on_mount(self) -> None:
-        if self.strategies:
-            await self.build_params(next(iter(self.strategies)))
-
-    async def on_select_changed(self, event: Select.Changed) -> None:
-        if event.select.id == "opt-strategy" and event.value is not Select.BLANK:
-            await self.build_params(event.value)
-
-    async def build_params(self, strat_name: str) -> None:
-        if strat_name == self._built_for:
-            return
-        self._built_for = strat_name
-        container = self.query_one("#opt-params", Vertical)
-        await container.remove_children()
-        cls = self.strategies.get(strat_name)
-        if not cls:
-            return
-        widgets = []
-        for pname, default in cls.get_params().items():
-            if isinstance(default, bool) or not isinstance(default, (int, float)):
-                # Non-numeric parameter: held fixed during optimization.
-                widgets.append(Label(f"{pname} (fixed)"))
-                widgets.append(Input(value=str(default), id=f"optfix-{pname}"))
-                continue
-            low = max(1, default // 2) if isinstance(default, int) else default / 2
-            high = default * 2 if default else 10
-            widgets.append(Label(pname))
-            row = Horizontal(
-                Input(value=str(low), id=f"opt-min-{pname}", classes="range-in"),
-                Input(value=str(high), id=f"opt-max-{pname}", classes="range-in"),
-                Input(value="1", id=f"opt-step-{pname}", classes="range-in"),
-                classes="row",
-            )
-            widgets.append(row)
-        await container.mount(*widgets)
-
-    def collect(self) -> dict:
-        strat = self.query_one("#opt-strategy", Select).value
-        if strat is Select.BLANK:
-            raise ValueError("Select a strategy.")
-        cls = self.strategies[strat]
-        ranges: dict = {}
-        fixed: dict = {}
-        for pname, default in cls.get_params().items():
-            if isinstance(default, bool) or not isinstance(default, (int, float)):
-                fixed[pname] = coerce_param(
-                    self.query_one(f"#optfix-{pname}", Input).value, default
-                )
-                continue
-            low = float(self.query_one(f"#opt-min-{pname}", Input).value)
-            high = float(self.query_one(f"#opt-max-{pname}", Input).value)
-            if low >= high:
-                raise ValueError(f"{pname}: min must be less than max.")
-            is_int = isinstance(default, int) and not isinstance(default, bool)
-            ranges[pname] = (low, high, is_int)
-        if not ranges:
-            raise ValueError("This strategy has no numeric parameters to optimize.")
-        return {
-            "ticker": self.query_one("#opt-ticker", Input).value.strip(),
-            "start": self.query_one("#opt-start", Input).value.strip(),
-            "end": self.query_one("#opt-end", Input).value.strip(),
-            "strat_name": strat,
-            "ranges": ranges,
-            "fixed_params": fixed,
-            "metric": self.query_one("#opt-metric", Select).value,
-            "n_calls": int(self.query_one("#opt-iterations", Input).value),
-            "cash": float(self.query_one("#opt-cash", Input).value),
-            "commission": float(self.query_one("#opt-commission", Input).value),
-        }
-
-    def set_status(self, text: str) -> None:
-        self.query_one("#opt-status", Static).update(text)
-
-    def reset_progress(self, total: int) -> None:
-        self.query_one("#opt-progress", ProgressBar).update(total=total, progress=0)
-
-    def advance_progress(self, current: int, total: int) -> None:
-        self.query_one("#opt-progress", ProgressBar).update(
-            total=total, progress=current
-        )
-
-
-class ResultsPanel(VerticalScroll):
-    def compose(self) -> ComposeResult:
-        yield Label("Results", classes="panel-title")
-        yield Static(
-            "Run a backtest or optimization to see results.", id="res-placeholder"
-        )
-        yield DataTable(id="res-table", zebra_stripes=True, cursor_type="none")
-        yield Static("", id="res-best", classes="section")
-        with Horizontal(classes="row"):
-            yield Button("Open Chart", id="open-chart", disabled=True)
-            yield Button("Run with Best Params", id="run-best", disabled=True)
-
-    def on_mount(self) -> None:
-        table = self.query_one("#res-table", DataTable)
-        table.add_columns("Metric", "Value")
-
-    def show(self, summary, best_text: str = "", enable_best: bool = False) -> None:
-        self.query_one("#res-placeholder", Static).display = False
-        table = self.query_one("#res-table", DataTable)
-        table.clear()
-        for label, value in summary:
-            table.add_row(label, value)
-        self.query_one("#res-best", Static).update(best_text)
-        self.query_one("#open-chart", Button).disabled = False
-        self.query_one("#run-best", Button).disabled = not enable_best
-
-
-class StrategiesPanel(VerticalScroll):
-    def __init__(self, strategies: dict, **kwargs) -> None:
-        super().__init__(**kwargs)
-        self.strategies = strategies
-
-    def compose(self) -> ComposeResult:
-        yield Label("Strategies", classes="panel-title")
-        for name, cls in self.strategies.items():
-            params = cls.get_params()
-            param_text = (
-                ", ".join(f"{k}={v}" for k, v in params.items()) or "(none)"
-            )
-            body = (
-                f"[b]{name}[/b]\n"
-                f"{cls.description()}\n"
-                f"[dim]Parameters:[/dim] {param_text}"
-            )
-            yield Static(body, classes="strategy-card")
-        yield Static(
-            "[b]Add your own[/b]\n"
-            "Drop a [i].py[/i] file into the [i]strategies/[/i] folder. Inherit "
-            "from [i]WSlabStrategy[/i] (import it with "
-            "[i]from wslab.strategy import WSlabStrategy[/i]), declare parameters "
-            "as class attributes, and implement [i]longSignal()[/i] and "
-            "[i]shortSignal()[/i]. It is auto-discovered on next launch.",
-            classes="strategy-card",
-        )
-
-
-# --------------------------------------------------------------------------
-# App
-# --------------------------------------------------------------------------
-class WSlabApp(App):
-    TITLE = "WSLAB — Wall Street Lab"
-    CSS_PATH = "app.tcss"
-
-    BINDINGS = [
-        ("q", "quit", "Quit"),
-        ("b", "nav('backtest')", "Backtest"),
-        ("o", "nav('optimize')", "Optimize"),
-        ("r", "nav('results')", "Results"),
-        ("s", "nav('strategies')", "Strategies"),
-    ]
-
+class WSlabApp:
     def __init__(self) -> None:
-        super().__init__()
+        self.console = Console()
         self.strategies = discover(STRATEGIES_DIR)
         self.last_result = None
         self.best_config: dict | None = None
 
-    def compose(self) -> ComposeResult:
-        yield Header()
-        with Horizontal(id="body"):
-            with Vertical(id="sidebar"):
-                yield Button("Backtest", id="nav-backtest")
-                yield Button("Optimize", id="nav-optimize")
-                yield Button("Results", id="nav-results")
-                yield Button("Strategies", id="nav-strategies")
-            with ContentSwitcher(initial="backtest", id="content"):
-                yield BacktestPanel(self.strategies, id="backtest")
-                yield OptimizePanel(self.strategies, id="optimize")
-                yield ResultsPanel(id="results")
-                yield StrategiesPanel(self.strategies, id="strategies")
-        yield Footer()
+    # -- entry point -------------------------------------------------------
+    def run(self) -> None:
+        self.console.clear()
+        self._print_header()
+        actions = {
+            "b": self.do_backtest,
+            "o": self.do_optimize,
+            "r": self.do_results,
+            "s": self.do_strategies,
+        }
+        while True:
+            self._print_menu()
+            choice = Prompt.ask(
+                "[bold]Select[/]",
+                choices=["b", "o", "r", "s", "q"],
+                default="b",
+            )
+            if choice == "q":
+                break
+            self.console.print()
+            try:
+                actions[choice]()
+            except (KeyboardInterrupt, EOFError):
+                self.console.print("\n[dim]Cancelled.[/]")
+        self.console.print("\n[bold cyan]Goodbye.[/]")
 
-    # -- navigation --------------------------------------------------------
-    def action_nav(self, target: str) -> None:
-        self.query_one("#content", ContentSwitcher).current = target
+    # -- chrome ------------------------------------------------------------
+    def _print_header(self) -> None:
+        title = Text("WSLAB — Wall Street Lab", style="bold green", justify="center")
+        subtitle = Text(
+            "TUI backtesting & Bayesian optimization · not for live trading",
+            style="dim",
+            justify="center",
+        )
+        self.console.print(
+            Panel(Text.assemble(title, "\n", subtitle), box=box.DOUBLE,
+                  border_style="green")
+        )
 
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        bid = event.button.id or ""
-        if bid.startswith("nav-"):
-            self.action_nav(bid[len("nav-"):])
-        elif bid == "run-backtest":
-            self._start_backtest()
-        elif bid == "run-optimize":
-            self._start_optimize()
-        elif bid == "open-chart":
-            self._open_chart()
-        elif bid == "run-best":
-            self._run_best()
+    def _print_menu(self) -> None:
+        menu = Table.grid(padding=(0, 2))
+        menu.add_column(style="bold cyan")
+        menu.add_column()
+        menu.add_row("b", "Backtest a strategy")
+        menu.add_row("o", "Optimize parameters (Bayesian)")
+        menu.add_row("r", "View last results")
+        menu.add_row("s", "Browse strategies")
+        menu.add_row("q", "Quit")
+        self.console.print(Panel(menu, title="Menu", border_style="blue",
+                                 box=box.ROUNDED, expand=False))
+
+    # -- shared prompts ----------------------------------------------------
+    def _choose_strategy(self) -> str | None:
+        names = list(self.strategies)
+        table = Table(box=box.SIMPLE, show_header=True, header_style="bold")
+        table.add_column("#", style="cyan", justify="right")
+        table.add_column("Strategy")
+        for i, name in enumerate(names, 1):
+            table.add_row(str(i), name)
+        self.console.print(table)
+        idx = IntPrompt.ask("Strategy #", choices=[str(i) for i in range(1, len(names) + 1)],
+                            default=1)
+        return names[idx - 1]
+
+    def _prompt_value(self, label: str, default):
+        """Prompt for a single typed value matching ``default``'s type."""
+        if isinstance(default, bool):
+            return Confirm.ask(label, default=default)
+        if isinstance(default, int):
+            return IntPrompt.ask(label, default=default)
+        if isinstance(default, float):
+            return FloatPrompt.ask(label, default=default)
+        return Prompt.ask(label, default=str(default))
+
+    def _prompt_common(self) -> dict:
+        ticker = Prompt.ask("Ticker", default="AAPL").strip().upper()
+        start = Prompt.ask("Start date (YYYY-MM-DD)", default="2020-01-01").strip()
+        end = Prompt.ask("End date (YYYY-MM-DD)", default="2023-01-01").strip()
+        return {"ticker": ticker, "start": start, "end": end}
 
     # -- backtest ----------------------------------------------------------
-    def _start_backtest(self) -> None:
-        panel = self.query_one(BacktestPanel)
-        try:
-            cfg = panel.collect()
-        except (ValueError, KeyError) as exc:
-            panel.set_status(f"[red]Invalid input:[/] {exc}")
-            return
-        panel.set_status("Running…")
-        self._backtest_worker(cfg, from_best=False)
+    def do_backtest(self, preset: dict | None = None) -> None:
+        if preset is None:
+            common = self._prompt_common()
+            strat_name = self._choose_strategy()
+            cls = self.strategies[strat_name]
+            self.console.print("[dim]Strategy parameters:[/]")
+            params = {
+                pname: self._prompt_value(f"  {pname}", default)
+                for pname, default in cls.get_params().items()
+            }
+            cash = FloatPrompt.ask("Cash", default=10000.0)
+            commission = FloatPrompt.ask("Commission", default=0.002)
+            cfg = {**common, "strat_name": strat_name, "params": params,
+                   "cash": cash, "commission": commission}
+        else:
+            cfg = preset
 
-    def _run_best(self) -> None:
-        if not self.best_config:
-            return
-        self.query_one(BacktestPanel).set_status("")
-        self._backtest_worker(self.best_config, from_best=True)
-
-    @work(thread=True, exclusive=True, group="run")
-    def _backtest_worker(self, cfg: dict, from_best: bool) -> None:
-        panel = self.query_one(BacktestPanel)
         try:
-            self.call_from_thread(panel.set_status, "Fetching data…")
-            data = fetch(cfg["ticker"], cfg["start"], cfg["end"])
+            with self.console.status("Fetching data…", spinner="dots"):
+                data = fetch(cfg["ticker"], cfg["start"], cfg["end"])
             cls = self.strategies[cfg["strat_name"]]
-            self.call_from_thread(panel.set_status, "Running backtest…")
-            result = run_backtest(
-                data, cls,
-                cash=cfg["cash"], commission=cfg["commission"],
-                params=cfg["params"],
-            )
-        except (DataError, ValueError, KeyError) as exc:
-            self.call_from_thread(panel.set_status, f"[red]Error:[/] {exc}")
-            return
-        except Exception as exc:  # backtesting.py / data edge cases
-            self.call_from_thread(panel.set_status, f"[red]Backtest failed:[/] {exc}")
-            return
-
-        self.last_result = result
-        best_text = self._format_best(cfg["params"]) if from_best else ""
-        self.call_from_thread(panel.set_status, "[green]Done.[/]")
-        self.call_from_thread(
-            self.query_one(ResultsPanel).show, result.summary(), best_text, False
-        )
-        self.call_from_thread(self.action_nav, "results")
-
-    # -- optimize ----------------------------------------------------------
-    def _start_optimize(self) -> None:
-        panel = self.query_one(OptimizePanel)
-        try:
-            cfg = panel.collect()
-        except (ValueError, KeyError) as exc:
-            panel.set_status(f"[red]Invalid input:[/] {exc}")
-            return
-        panel.set_status("Starting optimization…")
-        panel.reset_progress(cfg["n_calls"])
-        self._optimize_worker(cfg)
-
-    @work(thread=True, exclusive=True, group="run")
-    def _optimize_worker(self, cfg: dict) -> None:
-        panel = self.query_one(OptimizePanel)
-        try:
-            self.call_from_thread(panel.set_status, "Fetching data…")
-            data = fetch(cfg["ticker"], cfg["start"], cfg["end"])
-            cls = self.strategies[cfg["strat_name"]]
-
-            def on_step(i: int, total: int, best: float) -> None:
-                self.call_from_thread(panel.advance_progress, i, total)
-                self.call_from_thread(
-                    panel.set_status,
-                    f"Iteration {i}/{total} — best {cfg['metric']}: {best:,.3f}",
+            with self.console.status("Running backtest…", spinner="dots"):
+                result = run_backtest(
+                    data, cls, cash=cfg["cash"], commission=cfg["commission"],
+                    params=cfg["params"],
                 )
-
-            opt = optimize(
-                data, cls,
-                ranges=cfg["ranges"], metric=cfg["metric"],
-                n_calls=cfg["n_calls"], cash=cfg["cash"],
-                commission=cfg["commission"], fixed_params=cfg["fixed_params"],
-                on_step=on_step,
-            )
-            best_params = {**cfg["fixed_params"], **opt.best_params}
-            result = run_backtest(
-                data, cls,
-                cash=cfg["cash"], commission=cfg["commission"], params=best_params,
-            )
-        except (DataError, ValueError, KeyError) as exc:
-            self.call_from_thread(panel.set_status, f"[red]Error:[/] {exc}")
+        except DataError as exc:
+            self.console.print(f"[red]Data error:[/] {exc}")
             return
         except Exception as exc:
-            self.call_from_thread(panel.set_status, f"[red]Optimization failed:[/] {exc}")
+            self.console.print(f"[red]Backtest failed:[/] {exc}")
             return
 
         self.last_result = result
-        self.best_config = {
-            "ticker": cfg["ticker"], "start": cfg["start"], "end": cfg["end"],
-            "strat_name": cfg["strat_name"], "params": best_params,
-            "cash": cfg["cash"], "commission": cfg["commission"],
-        }
-        best_text = (
-            f"[b]Best parameters[/b] (max {opt.metric} = {opt.best_value:,.3f})\n"
-            + self._format_best(opt.best_params)
-        )
-        self.call_from_thread(panel.set_status, "[green]Optimization complete.[/]")
-        self.call_from_thread(
-            self.query_one(ResultsPanel).show, result.summary(), best_text, True
-        )
-        self.call_from_thread(self.action_nav, "results")
+        self._show_result(result)
+        self._maybe_open_chart()
 
-    @staticmethod
-    def _format_best(params: dict) -> str:
-        return ", ".join(f"{k}={v}" for k, v in params.items())
+    # -- optimize ----------------------------------------------------------
+    def do_optimize(self) -> None:
+        common = self._prompt_common()
+        strat_name = self._choose_strategy()
+        cls = self.strategies[strat_name]
+
+        ranges: dict = {}
+        fixed: dict = {}
+        self.console.print("[dim]Parameter ranges (numeric params are optimized):[/]")
+        for pname, default in cls.get_params().items():
+            if isinstance(default, bool) or not isinstance(default, (int, float)):
+                fixed[pname] = self._prompt_value(f"  {pname} (fixed)", default)
+                continue
+            is_int = isinstance(default, int)
+            lo_default = max(1, default // 2) if is_int else default / 2
+            hi_default = default * 2 if default else 10
+            ask = IntPrompt.ask if is_int else FloatPrompt.ask
+            low = ask(f"  {pname} min", default=lo_default)
+            high = ask(f"  {pname} max", default=hi_default)
+            if low >= high:
+                self.console.print(f"[red]{pname}: min must be less than max.[/]")
+                return
+            ranges[pname] = (low, high, is_int)
+
+        if not ranges:
+            self.console.print("[red]This strategy has no numeric parameters to optimize.[/]")
+            return
+
+        metric_label = Prompt.ask("Metric to maximize",
+                                  choices=list(METRIC_OPTIONS), default="Sharpe Ratio")
+        metric = METRIC_OPTIONS[metric_label]
+        n_calls = IntPrompt.ask("Iterations", default=50)
+
+        try:
+            with self.console.status("Fetching data…", spinner="dots"):
+                data = fetch(common["ticker"], common["start"], common["end"])
+
+            with Progress(
+                TextColumn("[progress.description]{task.description}"),
+                BarColumn(),
+                MofNCompleteColumn(),
+                TimeElapsedColumn(),
+                console=self.console,
+            ) as progress:
+                task = progress.add_task(f"Optimizing ({metric_label})", total=n_calls)
+
+                def on_step(i: int, total: int, best: float) -> None:
+                    progress.update(task, completed=i, total=total,
+                                    description=f"best {metric_label}: {best:,.3f}")
+
+                opt = optimize(
+                    data, cls, ranges=ranges, metric=metric, n_calls=n_calls,
+                    cash=10000.0, commission=0.002, fixed_params=fixed,
+                    on_step=on_step,
+                )
+
+            best_params = {**fixed, **opt.best_params}
+            with self.console.status("Backtesting best parameters…", spinner="dots"):
+                result = run_backtest(data, cls, cash=10000.0, commission=0.002,
+                                      params=best_params)
+        except DataError as exc:
+            self.console.print(f"[red]Data error:[/] {exc}")
+            return
+        except Exception as exc:
+            self.console.print(f"[red]Optimization failed:[/] {exc}")
+            return
+
+        self.last_result = result
+        self.best_config = {**common, "strat_name": strat_name,
+                            "params": best_params, "cash": 10000.0,
+                            "commission": 0.002}
+
+        best_table = Table(box=box.SIMPLE, show_header=False)
+        best_table.add_column("Parameter", style="cyan")
+        best_table.add_column("Value", style="bold")
+        for k, v in opt.best_params.items():
+            best_table.add_row(k, str(v))
+        self.console.print(Panel(
+            best_table,
+            title=f"Best parameters (max {opt.metric} = {opt.best_value:,.3f})",
+            border_style="green", box=box.ROUNDED, expand=False,
+        ))
+        self._show_result(result)
+
+        if Confirm.ask("Run a fresh backtest with these parameters?", default=False):
+            self.do_backtest(preset=self.best_config)
+        else:
+            self._maybe_open_chart()
+
+    # -- results -----------------------------------------------------------
+    def do_results(self) -> None:
+        if self.last_result is None:
+            self.console.print("[yellow]No results yet. Run a backtest or optimization first.[/]")
+            return
+        self._show_result(self.last_result)
+        self._maybe_open_chart()
+
+    def _show_result(self, result) -> None:
+        table = Table(box=box.ROUNDED, show_header=True, header_style="bold magenta")
+        table.add_column("Metric")
+        table.add_column("Value", justify="right")
+        for label, value in result.summary():
+            table.add_row(label, value)
+        self.console.print(Panel(table, title="Results", border_style="magenta",
+                                 expand=False))
+
+    # -- strategies --------------------------------------------------------
+    def do_strategies(self) -> None:
+        for name, cls in self.strategies.items():
+            params = cls.get_params()
+            param_text = ", ".join(f"{k}={v}" for k, v in params.items()) or "(none)"
+            body = Text.assemble(
+                (cls.description() + "\n\n", ""),
+                ("Parameters: ", "dim"),
+                (param_text, "cyan"),
+            )
+            self.console.print(Panel(body, title=name, border_style="blue",
+                                     box=box.ROUNDED))
+        self.console.print(Panel(
+            "Drop a .py file into the strategies/ folder. Inherit from "
+            "WSlabStrategy (from wslab.strategy import WSlabStrategy), declare "
+            "parameters as class attributes, and implement longSignal() and "
+            "shortSignal(). It is auto-discovered on next launch.",
+            title="Add your own", border_style="green", box=box.ROUNDED,
+        ))
 
     # -- charting ----------------------------------------------------------
-    def _open_chart(self) -> None:
+    def _maybe_open_chart(self) -> None:
         if self.last_result is None:
-            self.notify("No backtest to chart yet.", severity="warning")
             return
-        self.notify("Generating chart…")
-        self._chart_worker()
+        if Confirm.ask("Open the interactive HTML chart in your browser?",
+                       default=False):
+            self._open_chart()
 
-    @work(thread=True, exclusive=True, group="chart")
-    def _chart_worker(self) -> None:
-        result = self.last_result
-        if result is None:
-            return
+    def _open_chart(self) -> None:
         try:
             OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
             stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             path = OUTPUT_DIR / f"chart_{stamp}.html"
-            result.bt.plot(filename=str(path), open_browser=False)
+            with self.console.status("Generating chart…", spinner="dots"):
+                self.last_result.bt.plot(filename=str(path), open_browser=False)
             webbrowser.open(f"file://{path}")
-            self.call_from_thread(
-                self.notify, f"Chart saved to output/{path.name}"
-            )
+            self.console.print(f"[green]Chart saved to[/] output/{path.name}")
         except Exception as exc:
-            self.call_from_thread(
-                self.notify, f"Chart failed: {exc}", severity="error"
-            )
+            self.console.print(f"[red]Chart failed:[/] {exc}")
 
 
 if __name__ == "__main__":

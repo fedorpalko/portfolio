@@ -1,4 +1,4 @@
-textual>=0.60
+rich>=13.0
 backtesting>=0.3.3
 yfinance>=0.2.40
 pandas>=1.5
