@@ -1,0 +1,12 @@
+textual>=0.60
+backtesting>=0.3.3
+yfinance>=0.2.40
+pandas>=1.5
+numpy>=1.23
+scikit-optimize>=0.10.0
+bokeh>=3.1
+
+# pandas-ta is the preferred indicator library but is installed best-effort by
+# setup.sh: it (via numba) does not yet support Python 3.14. When it is absent,
+# WSLAB transparently falls back to equivalent pandas implementations.
+# pandas-ta>=0.3.14b0
