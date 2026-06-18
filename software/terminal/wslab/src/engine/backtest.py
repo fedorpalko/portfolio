@@ -43,6 +43,25 @@ class BacktestResult:
         return [(label, _fmt(self.metric(label))) for label in METRIC_KEYS]
 
 
+def make_backtest(
+    data, strategy_cls, cash: float = 10_000, commission: float = 0.002
+) -> Backtest:
+    """Construct a Backtest, enabling ``finalize_trades`` where supported.
+
+    Building a Backtest validates and copies the data, so the optimizer reuses
+    a single instance across iterations instead of paying that cost each call.
+    """
+    try:
+        # finalize_trades closes positions open at the end so they count in the
+        # stats. Added in newer backtesting.py; fall back if unsupported.
+        return Backtest(
+            data, strategy_cls, cash=cash, commission=commission,
+            finalize_trades=True,
+        )
+    except TypeError:
+        return Backtest(data, strategy_cls, cash=cash, commission=commission)
+
+
 def run_backtest(
     data,
     strategy_cls,
@@ -51,14 +70,6 @@ def run_backtest(
     params: dict | None = None,
 ) -> BacktestResult:
     params = params or {}
-    try:
-        # finalize_trades closes positions open at the end so they count in the
-        # stats. Added in newer backtesting.py; fall back if unsupported.
-        bt = Backtest(
-            data, strategy_cls, cash=cash, commission=commission,
-            finalize_trades=True,
-        )
-    except TypeError:
-        bt = Backtest(data, strategy_cls, cash=cash, commission=commission)
+    bt = make_backtest(data, strategy_cls, cash=cash, commission=commission)
     stats = bt.run(**params)
     return BacktestResult(stats=stats, bt=bt, params=dict(params))

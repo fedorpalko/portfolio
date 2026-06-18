@@ -139,11 +139,24 @@ class WSlabApp:
         can be), so a bad pairing is rejected with an explanation rather than
         left to fail at download time.
         """
-        self.console.print(
-            "[dim]Chart interval — intraday bars have limited history: "
-            "1m ≤7d & ~30d back · 2m–90m ~60d back · 60m/1h ~730d back · "
-            "1d and coarser unlimited.[/]"
+        note = Text(
+            "intraday bars have limited history\n"
+            "1m  · ≤ 7 days per call, ~30 days back\n"
+            "2m–90m  · ~60 days back\n"
+            "60m / 1h  · ~730 days back\n"
+            "1d and coarser  · unlimited",
+            style="italic grey58",
+            justify="left",
         )
+        self.console.print(Panel(
+            note,
+            title=Text("ⓘ  interval limits", style="dim italic"),
+            title_align="left",
+            border_style="grey37",
+            box=box.MINIMAL,
+            padding=(0, 1),
+            expand=False,
+        ))
         while True:
             interval = Prompt.ask("Interval", choices=VALID_INTERVALS, default="1d")
             warning = check_interval(start, end, interval)

@@ -29,6 +29,16 @@ class DataError(Exception):
     """Raised when market data cannot be loaded or is unusable."""
 
 
+# In-session cache of cleaned frames, keyed by (ticker, start, end, interval).
+# Historical bars don't change within a run, so repeat requests (e.g. running a
+# backtest with the optimizer's best params) skip the network entirely.
+_CACHE: dict[tuple, pd.DataFrame] = {}
+
+
+def clear_cache() -> None:
+    _CACHE.clear()
+
+
 def _parse_date(value: str) -> date:
     return datetime.strptime(value.strip(), "%Y-%m-%d").date()
 
@@ -79,6 +89,10 @@ def fetch(ticker: str, start: str, end: str, interval: str = "1d") -> pd.DataFra
     if not ticker:
         raise DataError("Ticker is empty.")
 
+    key = (ticker, start, end, interval)
+    if key in _CACHE:
+        return _CACHE[key].copy()
+
     try:
         df = yf.download(
             ticker, start=start, end=end, interval=interval,
@@ -105,4 +119,6 @@ def fetch(ticker: str, start: str, end: str, interval: str = "1d") -> pd.DataFra
     df = df[_OHLCV].dropna()
     if df.empty:
         raise DataError(f"No usable rows for {ticker} after cleaning.")
-    return df
+
+    _CACHE[key] = df
+    return df.copy()
