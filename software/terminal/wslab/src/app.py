@@ -27,7 +27,7 @@ from rich.table import Table
 from rich.text import Text
 
 from engine.backtest import run_backtest
-from engine.data import DataError, fetch
+from engine.data import VALID_INTERVALS, DataError, check_interval, fetch
 from engine.optimizer import optimize
 from loader import discover
 
@@ -129,7 +129,31 @@ class WSlabApp:
         ticker = Prompt.ask("Ticker", default="AAPL").strip().upper()
         start = Prompt.ask("Start date (YYYY-MM-DD)", default="2020-01-01").strip()
         end = Prompt.ask("End date (YYYY-MM-DD)", default="2023-01-01").strip()
-        return {"ticker": ticker, "start": start, "end": end}
+        interval = self._prompt_interval(start, end)
+        return {"ticker": ticker, "start": start, "end": end, "interval": interval}
+
+    def _prompt_interval(self, start: str, end: str) -> str:
+        """Prompt for a chart interval, re-asking until it's valid for the range.
+
+        yfinance caps how far back intraday bars go (and how wide a 1m request
+        can be), so a bad pairing is rejected with an explanation rather than
+        left to fail at download time.
+        """
+        self.console.print(
+            "[dim]Chart interval — intraday bars have limited history: "
+            "1m ≤7d & ~30d back · 2m–90m ~60d back · 60m/1h ~730d back · "
+            "1d and coarser unlimited.[/]"
+        )
+        while True:
+            interval = Prompt.ask("Interval", choices=VALID_INTERVALS, default="1d")
+            warning = check_interval(start, end, interval)
+            if warning is None:
+                return interval
+            self.console.print(Panel(
+                warning, title="⚠  That interval won't work for this range",
+                border_style="red", box=box.ROUNDED, expand=False,
+            ))
+            self.console.print("[yellow]Pick another interval.[/]")
 
     # -- backtest ----------------------------------------------------------
     def do_backtest(self, preset: dict | None = None) -> None:
@@ -149,9 +173,10 @@ class WSlabApp:
         else:
             cfg = preset
 
+        interval = cfg.get("interval", "1d")
         try:
-            with self.console.status("Fetching data…", spinner="dots"):
-                data = fetch(cfg["ticker"], cfg["start"], cfg["end"])
+            with self.console.status(f"Fetching {interval} data…", spinner="dots"):
+                data = fetch(cfg["ticker"], cfg["start"], cfg["end"], interval=interval)
             cls = self.strategies[cfg["strat_name"]]
             with self.console.status("Running backtest…", spinner="dots"):
                 result = run_backtest(
@@ -202,9 +227,11 @@ class WSlabApp:
         metric = METRIC_OPTIONS[metric_label]
         n_calls = IntPrompt.ask("Iterations", default=50)
 
+        interval = common.get("interval", "1d")
         try:
-            with self.console.status("Fetching data…", spinner="dots"):
-                data = fetch(common["ticker"], common["start"], common["end"])
+            with self.console.status(f"Fetching {interval} data…", spinner="dots"):
+                data = fetch(common["ticker"], common["start"], common["end"],
+                             interval=interval)
 
             with Progress(
                 TextColumn("[progress.description]{task.description}"),
