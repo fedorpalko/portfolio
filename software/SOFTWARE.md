@@ -7,7 +7,8 @@ Welcome to the **Software** section. Here is a curated list of every coding proj
 
 ### TUI/CLI Applications
 
-[WSLAB](terminal/wslab/README.md) is a terminal-based backtesting engine built primarily for the stock market, compatible with custom strategies or the built-in ones.
+[WSLAB](terminal/wslab/README.md) is a terminal-based backtesting engine built primarily for the stock market, compatible with custom strategies or the built-in ones.\
+[Fincli](terminal/fincli/README.md) is a simple terminal application designed to view the current price of stocks, price changes across multiple periods, all in a clean and colored interface.
 
 ### Games
 ### Scripts
