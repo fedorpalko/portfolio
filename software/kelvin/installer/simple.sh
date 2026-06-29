@@ -338,6 +338,57 @@ simple_screen_confirm() {
 # Screen 7 — Installing
 # ─────────────────────────────────────────────────────────────────────────────
 
+# Shown when any install step fails. Displays the failed step and drops the
+# user into an interactive root shell so they can investigate (/mnt holds the
+# partially-installed system). We `exec` the shell so we never return into the
+# auto-relaunch loop that getty drives on tty1.
+_simple_install_failed() {
+  local step="$1"
+  clear
+
+  gum style \
+    --foreground "$KELVIN_WHITE" \
+    --background "#FF6B6B" \
+    --border rounded \
+    --border-foreground "#FF6B6B" \
+    --padding "1 3" \
+    --width 60 \
+    "Something went wrong while installing." \
+    "" \
+    "Step that failed:" \
+    "  ${step}" \
+    "" \
+    "The error output is shown above. The target system" \
+    "is mounted at /mnt if you want to poke around." \
+    "" \
+    "Dropping you to a shell. Run 'reboot' when you're done."
+
+  echo
+  exec bash
+}
+
+# Run one install step with a spinner.
+#
+# `gum spin` executes its command as a *child process*, so it cannot call the
+# shell functions defined in generate.sh (partition_disk_simple,
+# generate_kelvin_config_simple) directly — they aren't on PATH. Previously this
+# meant the very first step failed instantly and `set -e` killed the whole
+# script, bouncing the user back to the start. We fix that by running every step
+# inside a child bash that first sources generate.sh, so both shell-function
+# steps and plain binaries (nixos-install, …) work uniformly. The S_* answers
+# are exported (see simple_screen_installing) so the child shell can read them.
+#
+# On failure we surface the captured output (gum spin --show-error) and drop to
+# a shell, rather than letting `set -e` abort silently.
+_simple_step() {
+  local title="$1"
+  shift
+  if ! gum spin --spinner dot --show-error --title "$title" -- \
+      bash -c 'source "$0"; "$@"' "${SCRIPT_DIR}/generate.sh" "$@"; then
+    _simple_install_failed "$title"
+  fi
+}
+
 simple_screen_installing() {
   clear
   _simple_header
@@ -354,23 +405,27 @@ simple_screen_installing() {
 
   echo
 
-  # Source the generation script and run the install
-  source "${SCRIPT_DIR}/generate.sh"
+  # Export the collected answers so the child shells spawned by _simple_step
+  # (which source generate.sh) can read them.
+  export S_FULL_NAME S_EMAIL S_USERNAME S_PASSWORD S_TIMEZONE \
+         S_KEYBOARD S_DISK S_USECASES S_HOSTNAME
 
-  gum spin --spinner dot --title "Partitioning ${S_DISK}..." -- \
+  _simple_step "Partitioning ${S_DISK}..." \
     partition_disk_simple "$S_DISK"
 
-  gum spin --spinner dot --title "Generating hardware configuration..." -- \
+  _simple_step "Generating hardware configuration..." \
     nixos-generate-config --root /mnt
 
-  gum spin --spinner dot --title "Writing Kelvin configuration..." -- \
+  _simple_step "Writing Kelvin configuration..." \
     generate_kelvin_config_simple
 
-  gum spin --spinner dot --title "Building system (this takes a while — seriously, go get that drink)..." -- \
-    nixos-install --root /mnt --flake /mnt/home/${S_USERNAME}/.kelvin/#kelvin --no-root-passwd
+  _simple_step "Building system (this takes a while — seriously, go get that drink)..." \
+    nixos-install --root /mnt --flake "/mnt/home/${S_USERNAME}/.kelvin/#kelvin" --no-root-passwd
 
-  gum spin --spinner dot --title "Setting password..." -- \
+  _simple_step "Setting password..." \
     bash -c "echo '${S_USERNAME}:${S_PASSWORD}' | nixos-enter --root /mnt -- chpasswd"
+
+  return 0
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -414,8 +469,13 @@ run_simple_install() {
   simple_screen_disk
 
   if simple_screen_confirm; then
-    simple_screen_installing
-    simple_screen_done
+    # simple_screen_installing handles its own failures (it drops to a shell),
+    # so it only returns success once the whole install has completed. Guard the
+    # done screen on that success so a failed install can never fall through to
+    # "you're all set!".
+    if simple_screen_installing; then
+      simple_screen_done
+    fi
   else
     # User backed out — loop back to disk selection
     run_simple_install
