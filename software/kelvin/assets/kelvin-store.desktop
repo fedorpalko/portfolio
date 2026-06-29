@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Kelvin Store
+GenericName=Package Manager
+Comment=Search and install packages from nixpkgs
+Exec=konsole --hide-menubar --hide-tabbar -e kelvin-store
+Icon=kelvin-store
+Categories=System;PackageManager;
+Keywords=nix;nixpkgs;packages;install;search;kelvin;store;
+StartupNotify=false
+Terminal=false

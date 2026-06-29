@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Kelvin System Manager
+GenericName=System Manager
+Comment=Manage your Kelvin NixOS installation — update, rollback, clean
+Exec=konsole --hide-menubar --hide-tabbar -e kelvin
+Icon=kelvin
+Categories=System;
+Keywords=nix;nixos;update;rollback;system;kelvin;
+StartupNotify=false
+Terminal=false
