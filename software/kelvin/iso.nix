@@ -5,7 +5,18 @@
     "${modulesPath}/installer/cd-dvd/installation-cd-minimal.nix"
   ];
 
-  isoImage.isoName = lib.mkForce "kelvin-installer.iso";
+  # Name the image. `isoImage.isoName` was renamed to `image.fileName` in
+  # NixOS 25.05 (the old name is now only a deprecated alias). We drive it
+  # through `image.baseName` so every derived path stays consistent:
+  #   image.fileName -> "kelvin-installer.iso"      (baseName + ".iso")
+  #   image.filePath -> "iso/kelvin-installer.iso"
+  #   store path / on-disk file -> kelvin-installer.iso
+  # Setting only image.fileName would rename the symlink target but leave the
+  # actual ISO file named "nixos-...", so we set baseName instead. The default
+  # baseName also embeds isoImage.edition ("minimal"), which is what produced
+  # the misleading "nixos-minimal-*.iso" name previously.
+  image.baseName = lib.mkForce "kelvin-installer";
+
   isoImage.makeEfiBootable  = true;
   isoImage.makeUsbBootable  = true;
   isoImage.squashfsCompression = "zstd -Xcompression-level 6";

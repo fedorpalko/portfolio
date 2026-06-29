@@ -8,11 +8,28 @@
 
 set -euo pipefail
 
-ISO="result/iso/kelvin-installer.iso"
+# Locate the built ISO. `nix build .#iso` leaves a `result` symlink that may be
+# either the ISO file itself or a directory containing it under `iso/`
+# (the native nixpkgs image system puts it at `iso/kelvin-installer.iso`).
+RESULT="result"
 
-if [[ ! -f "$ISO" ]]; then
-  echo "ISO not found at $ISO"
-  echo "Build it first: nix build .#packages.x86_64-linux.iso"
+if [[ ! -e "$RESULT" ]]; then
+  echo "No build output at ./$RESULT"
+  echo "Build it first: nix build .#iso"
+  exit 1
+fi
+
+if [[ -f "$RESULT" ]]; then
+  # result is a direct symlink to the ISO file
+  ISO="$RESULT"
+else
+  # result is a directory — find the first .iso inside it
+  ISO="$(find -L "$RESULT" -type f -name '*.iso' | head -n1)"
+fi
+
+if [[ -z "${ISO:-}" || ! -f "$ISO" ]]; then
+  echo "Could not find an .iso under ./$RESULT"
+  echo "Build it first: nix build .#iso"
   exit 1
 fi
 

@@ -9,11 +9,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nixos-generators = {
-      url = "github:nix-community/nixos-generators";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -26,7 +21,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, nixos-generators, disko, plasma-manager, ... }:
+  outputs = { self, nixpkgs, home-manager, disko, plasma-manager, ... }:
   let
     system = "x86_64-linux";
     pkgs   = nixpkgs.legacyPackages.${system};
@@ -45,16 +40,18 @@
       ];
     };
 
-    # Installer ISO
+    # Installer ISO — built with the native nixpkgs ISO image system
+    # (nixos-generators was upstreamed/deprecated as of NixOS 25.05). We
+    # evaluate a NixOS configuration whose iso.nix imports the native
+    # installation-cd module and expose its `system.build.isoImage` output.
     packages.${system} = {
-      iso = nixos-generators.nixosGenerate {
+      iso = (nixpkgs.lib.nixosSystem {
         inherit system;
         modules = [
           ./options.nix
           ./iso.nix
         ];
-        format = "iso";
-      };
+      }).config.system.build.isoImage;
 
       kelvin       = pkgs.callPackage ./tools/kelvin/default.nix {};
       kelvin-store = pkgs.callPackage ./tools/kelvin-store/default.nix {};
