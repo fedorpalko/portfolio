@@ -79,6 +79,14 @@
   # sourcing simple.sh / advanced.sh / detect.sh / generate.sh all resolve.
   environment.etc."kelvin-installer".source = ./installer;
 
+  # Enable flakes in the LIVE installer environment. Both `disko` and
+  # `nixos-install --flake ...` shell out to `nix` with flake-based commands, so
+  # without these experimental features the installer fails at partitioning with
+  # "experimental Nix feature 'nix-command'/'flakes' is disabled". (This is the
+  # live ISO's nix config; the installed system gets its own from the generated
+  # flake.)
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
   # Networking in the live environment
   networking.networkmanager.enable = true;
   networking.wireless.enable       = lib.mkForce false;
