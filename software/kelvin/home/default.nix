@@ -6,6 +6,7 @@
     ./git.nix
     ./starship.nix
     ./konsole.nix
+    ./plasma.nix
   ];
 
   home.username    = kelvinCfg.username;

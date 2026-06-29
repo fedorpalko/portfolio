@@ -50,6 +50,13 @@ let inherit (lib) mkOption types; in
       description = "X11 and console keyboard layout.";
     };
 
+    disk = mkOption {
+      type        = types.str;
+      default     = "/dev/sda";
+      example     = "/dev/nvme0n1";
+      description = "Block device Kelvin is installed on. Set by the installer; used by disko.";
+    };
+
     # ── Hardware ──────────────────────────────────────────────────────────────
 
     gpu = mkOption {

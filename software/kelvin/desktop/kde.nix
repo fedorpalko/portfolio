@@ -1,6 +1,9 @@
 { config, pkgs, lib, ... }:
 
-let cfg = config.kelvin; in
+let
+  cfg             = config.kelvin;
+  kelvinSddmTheme = pkgs.callPackage ../assets/sddm-theme/default.nix {};
+in
 
 {
   # ── Display server + login manager ────────────────────────────────────────
@@ -12,8 +15,7 @@ let cfg = config.kelvin; in
   services.displayManager.sddm = {
     enable         = true;
     wayland.enable = true;
-    # TODO: apply Kelvin SDDM theme once assets/sddm-theme is created
-    # theme = "kelvin";
+    theme          = "kelvin";
   };
 
   services.displayManager.defaultSession = "plasma";
@@ -31,6 +33,7 @@ let cfg = config.kelvin; in
   # ── Base KDE applications ─────────────────────────────────────────────────
 
   environment.systemPackages = with pkgs; [
+    kelvinSddmTheme           # Kelvin SDDM login theme
     floorp               # default browser — Firefox fork, less telemetry
     kdePackages.konsole  # default terminal
     kdePackages.kate     # text editor (fallback when VSCode not installed)
@@ -52,13 +55,8 @@ let cfg = config.kelvin; in
     "x-scheme-handler/ftp"   = "floorp.desktop";
   };
 
-  # ── KDE config via plasma-manager (declarative Plasma state) ─────────────
-  # TODO: add plasma-manager as flake input and configure:
-  #   - panel layout (bottom, centered icons)
-  #   - 2 virtual desktops
-  #   - default apps
-  #   - keyboard shortcuts
-  # See: https://github.com/nix-community/plasma-manager
+  # plasma-manager config lives in home/plasma.nix (home-manager module).
+  # It reads kelvinCfg.desktop.{colorScheme,iconPack} to set Plasma theme.
 
   # ── KDE Wallet — auto-unlock at login ─────────────────────────────────────
   security.pam.services.sddm.enableKwallet = true;

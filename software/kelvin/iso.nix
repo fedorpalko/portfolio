@@ -27,6 +27,7 @@
     usbutils              # lsusb
     smartmontools         # smartctl for disk info
     lshw
+    disko                 # declarative disk partitioning
   ];
 
   # Auto-login root on tty1. Getty handles the TTY — we hook into the
