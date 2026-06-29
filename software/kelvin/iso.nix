@@ -55,13 +55,16 @@
     fi
   '';
 
-  # Bundle the installer scripts into the ISO at /etc/kelvin-installer/
-  # install.sh derives SCRIPT_DIR from its own path, so sourcing
-  # simple.sh / advanced.sh / detect.sh / generate.sh all resolve correctly.
-  environment.etc."kelvin-installer" = {
-    source = ./installer;
-    mode   = "0755";
-  };
+  # Bundle the installer scripts into the ISO at /etc/kelvin-installer/.
+  # IMPORTANT: do NOT set `mode` here. A non-symlink `mode` makes environment.etc
+  # copy/hardlink the entry as a single regular file (non-recursive `cp`), which
+  # for a *directory* source leaves /etc/kelvin-installer as a non-directory —
+  # so `/etc/kelvin-installer/install.sh` fails with ENOTDIR ("not a directory").
+  # With the default symlink mode, /etc/kelvin-installer becomes a symlink to the
+  # store directory and the scripts keep their executable bits from the repo.
+  # install.sh derives SCRIPT_DIR from its own path (resolving the symlink), so
+  # sourcing simple.sh / advanced.sh / detect.sh / generate.sh all resolve.
+  environment.etc."kelvin-installer".source = ./installer;
 
   # Networking in the live environment
   networking.networkmanager.enable = true;
