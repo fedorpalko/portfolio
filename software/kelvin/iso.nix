@@ -29,23 +29,23 @@
     lshw
   ];
 
-  # Auto-login as root on tty1 and launch the installer
+  # Auto-login root on tty1. Getty handles the TTY — we hook into the
+  # login shell rather than fighting it with a competing systemd unit.
   services.getty.autologinUser = lib.mkForce "root";
 
-  systemd.services.kelvin-installer = {
-    description = "Kelvin Installer";
-    after       = [ "network.target" "getty@tty1.service" ];
-    wantedBy    = [ "multi-user.target" ];
-    serviceConfig = {
-      Type      = "idle";
-      TTYPath   = "/dev/tty1";
-      StandardInput  = "tty";
-      StandardOutput = "tty";
-      ExecStart = "/etc/kelvin-installer/install.sh";
-    };
-  };
+  # Launch the installer immediately when root logs in on tty1.
+  # Using loginShellInit so it runs after the TTY is fully ready.
+  # `exec` replaces the shell — if the installer exits (e.g. user cancels),
+  # they drop back to a root shell on tty2+ instead of looping.
+  programs.bash.loginShellInit = ''
+    if [ "$(tty)" = "/dev/tty1" ]; then
+      exec /etc/kelvin-installer/install.sh
+    fi
+  '';
 
-  # Bundle the installer scripts into the ISO
+  # Bundle the installer scripts into the ISO at /etc/kelvin-installer/
+  # install.sh derives SCRIPT_DIR from its own path, so sourcing
+  # simple.sh / advanced.sh / detect.sh / generate.sh all resolve correctly.
   environment.etc."kelvin-installer" = {
     source = ./installer;
     mode   = "0755";
