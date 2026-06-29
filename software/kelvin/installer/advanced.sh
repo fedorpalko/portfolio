@@ -243,7 +243,57 @@ advanced_screen_identity() {
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Screen 5 — Bootloader
+# Screen 5 — Keyboard layout
+# ─────────────────────────────────────────────────────────────────────────────
+
+advanced_screen_keyboard() {
+  clear
+  _adv_header
+  _adv_question "KEYBOARD LAYOUT."
+
+  gum style --foreground "$KELVIN_WHITE" --padding "0 2" \
+    "what layout is your keyboard. be honest."
+  echo
+
+  local choice
+  choice=$(gum choose \
+    --item.foreground "$KELVIN_WHITE" \
+    --selected.foreground "$KELVIN_WHITE" \
+    --selected.background "$KELVIN_ICE" \
+    "us   — English (US)     ← probably this" \
+    "gb   — English (UK)" \
+    "de   — German" \
+    "fr   — French" \
+    "es   — Spanish" \
+    "it   — Italian" \
+    "pt   — Portuguese" \
+    "ru   — Russian" \
+    "sk   — Slovak" \
+    "cz   — Czech" \
+    "pl   — Polish" \
+    "nl   — Dutch" \
+    "Something else... — I need to search for it")
+
+  if [[ "$choice" == "Something else..."* ]]; then
+    gum style --foreground "$KELVIN_WHITE" --padding "0 2" \
+      "fine. type to search xkb layouts. it won't hold your hand."
+    echo
+    A_KEYBOARD=$(localectl list-x11-keymap-layouts 2>/dev/null \
+      | gum filter \
+          --placeholder "type a layout code (e.g. dvorak, colemak, latam)..." \
+          --prompt "  layout: " \
+          --prompt.foreground "$KELVIN_ICE" \
+          --height 12)
+  else
+    A_KEYBOARD=$(echo "$choice" | awk '{print $1}')
+  fi
+
+  # Final safety net
+  [[ -z "$A_KEYBOARD" ]] && A_KEYBOARD="us"
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Screen 6 — Bootloader
 # ─────────────────────────────────────────────────────────────────────────────
 
 advanced_screen_bootloader() {
@@ -738,6 +788,7 @@ run_advanced_install() {
   advanced_screen_arch
   advanced_screen_usecases
   advanced_screen_identity
+  advanced_screen_keyboard
   advanced_screen_bootloader
   advanced_screen_filesystem
   advanced_screen_disk

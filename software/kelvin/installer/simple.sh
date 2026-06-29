@@ -16,6 +16,8 @@ S_PASSWORD=""
 S_TIMEZONE=""
 S_KEYBOARD="us"
 S_DISK=""
+S_DISK_MODEL=""
+S_DISK_SIZE=""
 S_USECASES=""
 S_HOSTNAME=""
 
@@ -277,8 +279,10 @@ simple_screen_disk() {
     --selected.foreground "$KELVIN_WHITE" \
     --selected.background "$KELVIN_ICE")
 
-  # Extract just the /dev/xxx path
+  # Extract just the /dev/xxx path, then capture model and size for the summary
   S_DISK=$(echo "$S_DISK" | awk '{print $1}')
+  S_DISK_MODEL=$(lsblk -d -n -o MODEL "$S_DISK" 2>/dev/null | sed 's/  */ /g;s/^ //;s/ $//')
+  S_DISK_SIZE=$(lsblk -d -n -o SIZE  "$S_DISK" 2>/dev/null | tr -d ' ')
 
   echo
   gum style --foreground "$KELVIN_ICE" --padding "0 2" \
@@ -306,7 +310,7 @@ simple_screen_confirm() {
     --background "$KELVIN_ICE" \
     --padding "1 3" \
     --width 60 \
-    "✓  Install Kelvin on ${S_DISK}" \
+    "✓  Install Kelvin on ${S_DISK} (${S_DISK_MODEL}, ${S_DISK_SIZE})" \
     "✓  Create account: ${S_USERNAME}" \
     "✓  Timezone: ${S_TIMEZONE}" \
     "✓  Keyboard: ${S_KEYBOARD}" \
