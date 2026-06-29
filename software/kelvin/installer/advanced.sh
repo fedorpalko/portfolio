@@ -746,6 +746,57 @@ advanced_screen_confirm() {
 # Installing (advanced)
 # ─────────────────────────────────────────────────────────────────────────────
 
+# Shown when any install step fails. Names the failed step and drops the user
+# into an interactive root shell so they can investigate (/mnt holds the
+# partially-installed system). We `exec` the shell so we never return into the
+# auto-relaunch loop that getty drives on tty1.
+_advanced_install_failed() {
+  local step="$1"
+  clear
+
+  gum style \
+    --foreground "$KELVIN_WHITE" \
+    --background "#FF6B6B" \
+    --border rounded \
+    --border-foreground "#FF6B6B" \
+    --padding "1 3" \
+    --width 60 \
+    "installation failed." \
+    "" \
+    "step that failed:" \
+    "  ${step}" \
+    "" \
+    "the error output is shown above. the target system" \
+    "is mounted at /mnt if you want to investigate." \
+    "" \
+    "dropping you to a shell. run 'reboot' when you're done."
+
+  echo
+  exec bash
+}
+
+# Run one install step with a spinner.
+#
+# `gum spin` executes its command as a *child process*, so it cannot call the
+# shell functions defined in generate.sh (partition_disk_advanced,
+# generate_kelvin_config_advanced) directly — they aren't on PATH. Previously
+# this meant the very first step failed instantly and `set -e` killed the whole
+# script, bouncing the user back to the start. We fix that by running every step
+# inside a child bash that first sources generate.sh, so both shell-function
+# steps and plain binaries (nixos-install, …) work uniformly. The A_* answers
+# are exported (see advanced_screen_installing) so the child shell can read them.
+#
+# On failure we surface the captured output (gum spin --show-error) and drop to
+# a shell, rather than letting `set -e` abort silently.
+_advanced_step() {
+  local title="$1"
+  shift
+  if ! gum spin --spinner dot --show-error --title "$title" -- \
+      bash -c 'source "$0"; "$@"' "${SCRIPT_DIR}/generate.sh" "$@"; then
+    _advanced_install_failed "$title"
+  fi
+}
+
 advanced_screen_installing() {
   clear
   _adv_header
@@ -761,22 +812,29 @@ advanced_screen_installing() {
 
   echo
 
-  source "${SCRIPT_DIR}/generate.sh"
+  # Export the collected answers so the child shells spawned by _advanced_step
+  # (which source generate.sh) can read them.
+  export A_FULL_NAME A_EMAIL A_USERNAME A_PASSWORD A_HOSTNAME A_TIMEZONE \
+         A_KEYBOARD A_ARCH A_ANANICY A_USECASES A_BOOTLOADER A_BOOT_THEME \
+         A_FILESYSTEM A_COMPRESSION A_SWAP A_SWAP_SIZE A_DISK A_PARTITION_SCHEME \
+         A_CPU A_GPU A_CHANNEL A_KERNEL A_ICON_PACK A_FONT A_COLOR_SCHEME A_SERVICES
 
-  gum spin --spinner dot --title "partitioning ${A_DISK}..." -- \
+  _advanced_step "partitioning ${A_DISK}..." \
     partition_disk_advanced "$A_DISK" "$A_FILESYSTEM" "$A_SWAP" "$A_SWAP_SIZE" "$A_COMPRESSION"
 
-  gum spin --spinner dot --title "generating hardware configuration..." -- \
+  _advanced_step "generating hardware configuration..." \
     nixos-generate-config --root /mnt
 
-  gum spin --spinner dot --title "writing kelvin configuration..." -- \
+  _advanced_step "writing kelvin configuration..." \
     generate_kelvin_config_advanced
 
-  gum spin --spinner dot --title "building nix closures (this takes a while, get a coffee)..." -- \
-    nixos-install --root /mnt --flake /mnt/home/${A_USERNAME}/.kelvin/#kelvin --no-root-passwd
+  _advanced_step "building nix closures (this takes a while, get a coffee)..." \
+    nixos-install --root /mnt --flake "/mnt/home/${A_USERNAME}/.kelvin/#kelvin" --no-root-passwd
 
-  gum spin --spinner dot --title "setting password..." -- \
+  _advanced_step "setting password..." \
     bash -c "echo '${A_USERNAME}:${A_PASSWORD}' | nixos-enter --root /mnt -- chpasswd"
+
+  return 0
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -799,25 +857,29 @@ run_advanced_install() {
   advanced_screen_kde
 
   if advanced_screen_confirm; then
-    advanced_screen_installing
+    # advanced_screen_installing handles its own failures (it drops to a shell),
+    # so it only returns success once the whole install has completed. Guard the
+    # done screen on that success so a failed install can never fall through to
+    # "done. everything is registered."
+    if advanced_screen_installing; then
+      clear
+      _adv_header
+      gum style \
+        --foreground "$KELVIN_WHITE" \
+        --background "$KELVIN_DARK" \
+        --border double \
+        --border-foreground "$KELVIN_ICE" \
+        --padding "2 4" \
+        --align center \
+        --width 60 \
+        "❄️  K E L V I N  ❄️" \
+        "" \
+        "done. everything is registered." \
+        "reboot and it's yours."
 
-    clear
-    _adv_header
-    gum style \
-      --foreground "$KELVIN_WHITE" \
-      --background "$KELVIN_DARK" \
-      --border double \
-      --border-foreground "$KELVIN_ICE" \
-      --padding "2 4" \
-      --align center \
-      --width 60 \
-      "❄️  K E L V I N  ❄️" \
-      "" \
-      "done. everything is registered." \
-      "reboot and it's yours."
-
-    echo
-    gum confirm --affirmative "reboot." --negative "stay here" && reboot || true
+      echo
+      gum confirm --affirmative "reboot." --negative "stay here" && reboot || true
+    fi
   else
     run_advanced_install
   fi
