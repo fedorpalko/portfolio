@@ -396,10 +396,24 @@ _copy_kelvin_modules() {
       cp -r "${kelvin_source}/${subdir}" "${dir}/"
   done
 
-  for f in configuration.nix packages.nix; do
+  for f in configuration.nix packages.nix user-packages.nix; do
     [[ -f "${kelvin_source}/${f}" ]] && \
       cp "${kelvin_source}/${f}" "${dir}/"
   done
+
+  # Ensure user-packages.nix exists even if copy failed
+  if [[ ! -f "${dir}/user-packages.nix" ]]; then
+    cat > "${dir}/user-packages.nix" <<'UPEOF'
+# Packages installed via kelvin-store. Edit with: kelvin-store
+{ pkgs, ... }:
+{
+  environment.systemPackages = with pkgs; [
+    # KELVIN-STORE-BEGIN
+    # KELVIN-STORE-END
+  ];
+}
+UPEOF
+  fi
 }
 
 # ── Hardware config ───────────────────────────────────────────────────────────

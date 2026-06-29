@@ -6,8 +6,8 @@ Search nixpkgs live, add/remove packages, rebuild.
 Usage:
     kelvin-store          # open TUI
     kelvin-store search   <query>    # search without opening TUI
-    kelvin-store install  <package>  # add package to packages.nix and rebuild
-    kelvin-store remove   <package>  # remove package from packages.nix and rebuild
+    kelvin-store install  <package>  # add package to user-packages.nix and rebuild
+    kelvin-store remove   <package>  # remove package from user-packages.nix and rebuild
 """
 
 import subprocess
@@ -35,7 +35,7 @@ KELVIN_ICE   = "#5BA4CF"
 console = Console()
 
 KELVIN_DIR    = Path.home() / ".kelvin"
-PACKAGES_NIX  = KELVIN_DIR / "packages.nix"
+PACKAGES_NIX  = KELVIN_DIR / "user-packages.nix"   # kelvin-store owns this file
 FLAKE_TARGET  = f"{KELVIN_DIR}#kelvin"
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -98,9 +98,8 @@ def read_packages_nix() -> list[str]:
 def write_user_packages(packages: list[str]) -> None:
     """Write the kelvin-store managed block into packages.nix."""
     if not PACKAGES_NIX.exists():
-        # Create a minimal packages.nix
         PACKAGES_NIX.write_text(
-            "# ~/.kelvin/packages.nix — user packages added via kelvin-store\n"
+            "# ~/.kelvin/user-packages.nix — packages installed via kelvin-store\n"
             "{ pkgs, ... }:\n{\n"
             "  environment.systemPackages = with pkgs; [\n"
             "    # KELVIN-STORE-BEGIN\n"

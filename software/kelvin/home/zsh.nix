@@ -9,8 +9,9 @@
     history.share             = true;
 
     oh-my-zsh = {
-      enable  = true;
-      theme   = "robbyrussell";
+      enable = true;
+      # Theme is set to "" so starship (starship.nix) handles the prompt
+      theme  = "";
       plugins = [
         "git" "fzf" "z" "colored-man-pages"
         "command-not-found"

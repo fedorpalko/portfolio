@@ -16,6 +16,7 @@ let cfg = config.kelvin; in
     ./desktop/fonts.nix
     ./desktop/theme.nix
     ./packages.nix
+    ./user-packages.nix
   ];
 
   # Primary user account

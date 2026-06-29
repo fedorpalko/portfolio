@@ -4,6 +4,8 @@
   imports = [
     ./zsh.nix
     ./git.nix
+    ./starship.nix
+    ./konsole.nix
   ];
 
   home.username    = kelvinCfg.username;
