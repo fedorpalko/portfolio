@@ -357,10 +357,22 @@ _simple_install_failed() {
     "Something went wrong while installing." \
     "" \
     "Step that failed:" \
-    "  ${step}" \
-    "" \
-    "The error output is shown above. The target system" \
-    "is mounted at /mnt if you want to poke around." \
+    "  ${step}"
+
+  echo
+  # Show the captured output of the failed step. The screen was cleared above,
+  # so gum spin's own output is gone — this is the only place the real error
+  # (e.g. from disko / nixos-install) is visible.
+  if [[ -s /tmp/kelvin-install.log ]]; then
+    gum style --foreground "#FF6B6B" "  ─── error output (last 40 lines) ───"
+    echo
+    tail -n 40 /tmp/kelvin-install.log
+    echo
+  fi
+
+  gum style --foreground "$KELVIN_WHITE" \
+    "The target system is mounted at /mnt if you want to poke around." \
+    "Full log: /tmp/kelvin-install.log" \
     "" \
     "Press Enter to drop to a shell."
 
@@ -386,8 +398,13 @@ _simple_install_failed() {
 _simple_step() {
   local title="$1"
   shift
-  if ! gum spin --spinner dot --show-error --title "$title" -- \
-      bash -c 'source "$0"; "$@"' "${SCRIPT_DIR}/generate.sh" "$@"; then
+  # Run the step under a spinner, teeing its combined stdout+stderr to a log.
+  # gum spin hides command output and the failure screen clears the terminal, so
+  # without this capture the real error (e.g. from disko) is never visible.
+  # `exit ${PIPESTATUS[0]}` preserves the step's real exit code through the tee.
+  if ! gum spin --spinner dot --title "$title" -- \
+      bash -c 'source "$0"; "$@" 2>&1 | tee /tmp/kelvin-install.log; exit "${PIPESTATUS[0]}"' \
+      "${SCRIPT_DIR}/generate.sh" "$@"; then
     _simple_install_failed "$title"
   fi
 }
