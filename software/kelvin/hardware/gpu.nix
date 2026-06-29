@@ -7,7 +7,6 @@ let cfg = config.kelvin; in
   # NOTE: In NixOS 26+ this may be hardware.graphics.* instead of hardware.opengl.*
   hardware.opengl = {
     enable         = true;
-    driSupport     = true;
     driSupport32Bit = true;
 
     extraPackages = with pkgs;

@@ -41,7 +41,7 @@
         ./disko.nix
         home-manager.nixosModules.home-manager
         disko.nixosModules.disko
-        { home-manager.sharedModules = [ plasma-manager.homeManagerModules.plasma-manager ]; }
+        { home-manager.sharedModules = [ plasma-manager.homeModules.plasma-manager ]; }
       ];
     };
 

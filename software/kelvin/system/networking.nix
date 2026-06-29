@@ -6,7 +6,7 @@ let cfg = config.kelvin; in
   networking.hostName = cfg.hostname;
 
   networking.networkmanager.enable = true;
-  networking.wireless.enable       = false; # managed by NetworkManager
+  networking.wireless.enable       = lib.mkForce false; # managed by NetworkManager
 
   # Firewall — conservative defaults, open ports based on enabled services
   networking.firewall = {

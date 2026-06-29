@@ -54,7 +54,7 @@
 
   # Networking in the live environment
   networking.networkmanager.enable = true;
-  networking.wireless.enable       = false;
+  networking.wireless.enable       = lib.mkForce false;
 
   # Allow root SSH during installation (optional, for debugging)
   services.openssh = {

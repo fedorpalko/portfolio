@@ -5,7 +5,7 @@
     enable                    = true;
     autosuggestion.enable     = true;
     syntaxHighlighting.enable = true;
-    historySize               = 50000;
+    history.size              = 50000;
     history.share             = true;
 
     oh-my-zsh = {
