@@ -47,11 +47,24 @@
 
   # Launch the installer immediately when root logs in on tty1.
   # Using loginShellInit so it runs after the TTY is fully ready.
-  # `exec` replaces the shell — if the installer exits (e.g. user cancels),
-  # they drop back to a root shell on tty2+ instead of looping.
+  #
+  # Run it as a CHILD of the login shell — do NOT `exec`. With `exec`, the
+  # installer replaced the login shell, so the moment it exited for *any* reason
+  # (a failed install step, an error handler's shell hitting EOF, or the user
+  # choosing to stay in the live environment) the session ended and getty
+  # auto-relaunched the installer — which looked exactly like the installer
+  # "looping back to the start", far too fast to read any error.
+  #
+  # Running it as a child keeps this login shell alive as a safety net: when the
+  # installer exits, control returns here and we drop to an interactive root
+  # prompt with whatever the installer left on screen still visible.
   programs.bash.loginShellInit = ''
     if [ "$(tty)" = "/dev/tty1" ]; then
-      exec /etc/kelvin-installer/install.sh
+      /etc/kelvin-installer/install.sh || true
+      echo
+      echo "The Kelvin installer has exited — you're now at a root shell."
+      echo "Re-run it any time with:  /etc/kelvin-installer/install.sh"
+      echo
     fi
   '';
 

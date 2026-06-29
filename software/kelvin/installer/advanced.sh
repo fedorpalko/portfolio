@@ -746,10 +746,11 @@ advanced_screen_confirm() {
 # Installing (advanced)
 # ─────────────────────────────────────────────────────────────────────────────
 
-# Shown when any install step fails. Names the failed step and drops the user
-# into an interactive root shell so they can investigate (/mnt holds the
-# partially-installed system). We `exec` the shell so we never return into the
-# auto-relaunch loop that getty drives on tty1.
+# Shown when any install step fails. Names the failed step, then exits the
+# installer non-zero. On the ISO the installer runs as a child of the tty1 login
+# shell (see iso.nix), so exiting drops the user to an interactive root prompt
+# with this error still on screen — no auto-relaunch loop. The target system is
+# left mounted at /mnt for investigation.
 _advanced_install_failed() {
   local step="$1"
   clear
@@ -769,10 +770,12 @@ _advanced_install_failed() {
     "the error output is shown above. the target system" \
     "is mounted at /mnt if you want to investigate." \
     "" \
-    "dropping you to a shell. run 'reboot' when you're done."
+    "press Enter to drop to a shell."
 
   echo
-  exec bash
+  # Pause so the error is readable even outside the ISO's login-shell safety net.
+  read -r _ || true
+  exit 1
 }
 
 # Run one install step with a spinner.
