@@ -90,8 +90,9 @@ let cfg = config.kelvin; in
   # ── Virtualization ────────────────────────────────────────────────────────
 
   virtualisation.libvirtd = lib.mkIf cfg.useCases.virtualization {
-    enable           = true;
-    qemu.ovmf.enable = true;
+    enable            = true;
+    # qemu.ovmf was removed upstream — OVMF images shipped with QEMU are now
+    # available by default, so no explicit enable is needed.
     qemu.swtpm.enable = true;
   };
   programs.virt-manager.enable = cfg.useCases.virtualization;

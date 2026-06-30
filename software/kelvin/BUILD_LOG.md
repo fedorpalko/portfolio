@@ -127,6 +127,43 @@ Autonomous build/test/fix loop for the Kelvin NixOS installer, run by Claude.
 
 ---
 
+### Iteration 8 — KVM install (FAST), real bug in Development packages
+
+- **Environment fix:** Enabled Intel VT-x in BIOS → `/dev/kvm` now present →
+  QEMU runs with `-enable-kvm` (near-native). Also discovered `/tmp` is a 5.8 GiB
+  **tmpfs (RAM-backed)** — moved the binary cache + VM disk + swap onto the SSD
+  (`~/.cache/kelvin-vmtest`), freeing RAM and removing the disk-quota wall.
+  Under KVM: boot ~11 s, partition ~20 s, config write ~42 s (vs minutes under TCG).
+- **Error (REAL Kelvin bug):** `nixos-install` failed with
+  `error: undefined variable 'npm'`.
+- **Why host build missed it:** the host build used DEFAULT options (all
+  use-cases off), so it never evaluated the use-case package lists. The VM
+  install enables the **Development** use-case, which pulls in `packages.nix`'s
+  dev list — `nodejs npm`, but there is no standalone `npm` attribute (npm ships
+  inside `nodejs`).
+- **Fix:** `packages.nix:43` — `nodejs npm` → `nodejs`.
+- **Process fix:** added a host eval that enables EVERY use-case
+  (`scratchpad/all-usecases.nix`) to flush all use-case package errors at once,
+  instead of finding them one slow VM install at a time.
+
+### Iteration 9 — flush ALL use-case package bugs on the host
+
+Using `scratchpad/all-usecases.nix` (every use-case enabled) + `nix eval` to
+surface errors fast, fixed in sequence until eval was clean (`EVAL_EXIT: 0`):
+
+- `system/services.nix` — removed `virtualisation.libvirtd.qemu.ovmf.enable`
+  (option removed upstream; OVMF ships with QEMU by default). Was an assertion
+  failure under `useCases.virtualization`.
+- `packages.nix` (media + creative) — `kdenlive` → `kdePackages.kdenlive`
+  (moved under kdePackages in current nixpkgs).
+- `packages.nix` (server) — removed `portainer` (not in nixpkgs; runs as a
+  container).
+
+Result: the full config now evaluates with **every** use-case enabled, so no
+undefined-package/option errors remain on any install path. Then built the
+**Development** toplevel on the host (eval ≠ build) and seeded it into the VM
+binary cache so the install is fully local.
+
 ## Current status & how to resume (as of iteration 7 / run 5)
 
 **Where we are:** All host-build bugs fixed; the full system config builds on the

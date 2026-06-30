@@ -39,8 +39,8 @@ let cfg = config.kelvin; in
         black ruff mypy
       ]))
 
-      # Node
-      nodejs npm
+      # Node (npm ships inside the nodejs package; there is no standalone `npm`)
+      nodejs
 
       # Other dev tools
       gnumake gcc pkg-config
@@ -78,7 +78,7 @@ let cfg = config.kelvin; in
     (lib.optionals cfg.useCases.media [
       obs-studio
       spotify
-      kdenlive
+      kdePackages.kdenlive
       handbrake
       # vlc and ffmpeg already in base
     ])
@@ -88,7 +88,7 @@ let cfg = config.kelvin; in
       gimp
       inkscape
       krita
-      kdenlive  # deduped by nix if also in media
+      kdePackages.kdenlive  # deduped by nix if also in media
     ])
 
     # ── Science & Data ──────────────────────────────────────────────────────
@@ -113,7 +113,8 @@ let cfg = config.kelvin; in
 
     # ── Server & Hosting ────────────────────────────────────────────────────
     (lib.optionals cfg.useCases.server [
-      portainer  # TODO: verify nixpkgs name
+      # portainer is not packaged in nixpkgs — it's run as a container
+      # (e.g. via virtualisation.oci-containers), so it's intentionally omitted.
       nginx
       caddy
       postgresql
