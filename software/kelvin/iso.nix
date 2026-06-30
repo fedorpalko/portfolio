@@ -87,16 +87,22 @@
   # (configuration.nix is simply the first import the generated flake trips on;
   # options.nix survives only because the installer generates it fresh).
   #
-  # Every path flake.nix imports — directly (./configuration.nix, ./disko.nix)
-  # and transitively via configuration.nix (system/, hardware/, desktop/, home/,
-  # packages.nix, user-packages.nix) — must appear here AND in the copy list in
-  # _copy_kelvin_modules(). assets/ is bundled for completeness (themes, icons).
-  # options.nix and flake.nix/flake.lock are intentionally NOT baked: the
-  # installer generates those per-machine.
+  # Every path flake.nix imports — directly (./options.nix, ./configuration.nix,
+  # ./disko.nix) and transitively via configuration.nix (system/, hardware/,
+  # desktop/, home/, packages.nix, user-packages.nix) — must appear here AND in
+  # the copy list in _copy_kelvin_modules(). assets/ is bundled for completeness
+  # (themes, icons).
+  #
+  # options.nix is the option DECLARATIONS module (options.kelvin = mkOption ...);
+  # it MUST be baked and copied, otherwise config.kelvin does not exist and
+  # nixos-install fails with "attribute 'kelvin' missing". The installer writes
+  # the per-machine VALUES into a separate settings.nix (not baked). flake.nix and
+  # flake.lock are also generated per-machine and intentionally not baked.
   #
   # Paths are listed individually rather than baking `./.` on purpose: the repo
   # root contains a `result` symlink to the built ISO and flake.lock/iso.nix,
   # none of which belong in the image.
+  environment.etc."kelvin/options.nix".source       = ./options.nix;
   environment.etc."kelvin/configuration.nix".source = ./configuration.nix;
   environment.etc."kelvin/disko.nix".source         = ./disko.nix;
   environment.etc."kelvin/packages.nix".source      = ./packages.nix;
