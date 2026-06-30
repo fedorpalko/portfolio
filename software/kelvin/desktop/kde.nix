@@ -43,7 +43,7 @@ in
     kdePackages.spectacle # screenshot tool
     kdePackages.kwalletmanager
     kdePackages.kwallet-pam
-    libsForQt5.qt5.qtwayland  # Qt5 Wayland support
+    qt5.qtwayland  # Qt5 Wayland support
     qt6.qtwayland             # Qt6 Wayland support
   ];
 

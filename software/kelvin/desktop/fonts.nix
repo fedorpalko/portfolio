@@ -19,7 +19,7 @@ let cfg = config.kelvin; in
       ibm-plex             # IBM Plex Sans / Mono / Serif
       noto-fonts           # broad Unicode coverage
       noto-fonts-cjk-sans
-      noto-fonts-emoji
+      noto-fonts-color-emoji
       liberation_ttf       # metric-compatible Arial / Times / Courier
     ];
 

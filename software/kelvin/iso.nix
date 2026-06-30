@@ -121,6 +121,16 @@
   # flake.)
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
+  # Make `<nixpkgs>` resolvable in the live installer. The installer partitions
+  # by running `disko --mode ... /tmp/kelvin-disko.nix` on a *plain* (non-flake)
+  # disko file; disko evaluates that file with `nix-instantiate`, which needs
+  # `<nixpkgs>` on the Nix search path. A flake-based ISO sets no channels, so
+  # NIX_PATH is empty and partitioning fails with:
+  #   error: file 'nixpkgs' was not found in the Nix search path
+  # Pin it to the exact nixpkgs the ISO was built from (pkgs.path) so evaluation
+  # is hermetic and matches the rest of the system.
+  nix.nixPath = [ "nixpkgs=${pkgs.path}" ];
+
   # Networking in the live environment
   networking.networkmanager.enable = true;
   networking.wireless.enable       = lib.mkForce false;

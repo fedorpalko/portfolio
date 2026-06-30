@@ -53,6 +53,17 @@
         ];
       }).config.system.build.isoImage;
 
+      # Test-only ISO: same install logic, but auto-runs a non-interactive
+      # install over a serial console for the autonomous build-test-fix loop.
+      # See test/iso-test.nix and test-iso.sh. Not for end users.
+      iso-test = (nixpkgs.lib.nixosSystem {
+        inherit system;
+        modules = [
+          ./options.nix
+          ./test/iso-test.nix
+        ];
+      }).config.system.build.isoImage;
+
       kelvin       = pkgs.callPackage ./tools/kelvin/default.nix {};
       kelvin-store = pkgs.callPackage ./tools/kelvin-store/default.nix {};
     };
