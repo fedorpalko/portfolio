@@ -433,8 +433,13 @@ simple_screen_installing() {
   _simple_step "Partitioning ${S_DISK}..." \
     partition_disk_simple "$S_DISK"
 
+  # --no-filesystems: disko already declares fileSystems and swapDevices for
+  # every partition it manages (via disko.nix). Without this flag,
+  # nixos-generate-config also emits a fileSystems."/" block keyed by UUID,
+  # which conflicts with disko's by-partlabel definition and fails the build
+  # with: The option `fileSystems."/".device' has conflicting definition values.
   _simple_step "Generating hardware configuration..." \
-    nixos-generate-config --root /mnt
+    nixos-generate-config --no-filesystems --root /mnt
 
   _simple_step "Writing Kelvin configuration..." \
     generate_kelvin_config_simple

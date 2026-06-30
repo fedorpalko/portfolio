@@ -481,11 +481,15 @@ _write_hardware_config() {
   local dir="$1"
   local generated="/mnt/etc/nixos/hardware-configuration.nix"
 
+  # The installer runs `nixos-generate-config --no-filesystems --root /mnt`
+  # before this, so $generated carries hardware detection (kernel modules, CPU
+  # microcode hints, imports) but NO fileSystems/swapDevices — those belong to
+  # disko alone. We just relocate it under the flake as hardware/generated.nix.
   if [[ -f "$generated" ]]; then
     mkdir -p "${dir}/hardware"
     cp "$generated" "${dir}/hardware/generated.nix"
   else
     echo "WARNING: hardware-configuration.nix not found at ${generated}" >&2
-    echo "Run nixos-generate-config --root /mnt and copy the result to ${dir}/hardware/generated.nix" >&2
+    echo "Run nixos-generate-config --no-filesystems --root /mnt and copy the result to ${dir}/hardware/generated.nix" >&2
   fi
 }

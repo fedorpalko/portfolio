@@ -842,8 +842,12 @@ advanced_screen_installing() {
   _advanced_step "partitioning ${A_DISK}..." \
     partition_disk_advanced "$A_DISK" "$A_FILESYSTEM" "$A_SWAP" "$A_SWAP_SIZE" "$A_COMPRESSION"
 
+  # --no-filesystems: disko owns fileSystems/swapDevices (see disko.nix). Without
+  # this flag nixos-generate-config emits its own UUID-keyed fileSystems."/",
+  # which conflicts with disko's by-partlabel definition and fails the build with
+  # "The option `fileSystems.\"/\".device' has conflicting definition values".
   _advanced_step "generating hardware configuration..." \
-    nixos-generate-config --root /mnt
+    nixos-generate-config --no-filesystems --root /mnt
 
   _advanced_step "writing kelvin configuration..." \
     generate_kelvin_config_advanced
