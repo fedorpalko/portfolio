@@ -34,7 +34,7 @@ in
 
   environment.systemPackages = with pkgs; [
     kelvinSddmTheme           # Kelvin SDDM login theme
-    floorp               # default browser — Firefox fork, less telemetry
+    floorp-bin           # default browser — Firefox fork, less telemetry
     kdePackages.konsole  # default terminal
     kdePackages.kate     # text editor (fallback when VSCode not installed)
     kdePackages.dolphin  # file manager
