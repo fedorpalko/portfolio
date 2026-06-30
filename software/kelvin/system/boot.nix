@@ -20,17 +20,6 @@ let cfg = config.kelvin; in
   ];
   boot.kernelModules = [ "kvm-intel" "kvm-amd" ];
 
-  # WORKAROUND (upstream regression): linux-zen 7.0.x in current nixpkgs installs
-  # its kernel image as `vmlinuz`, but its `kernel.target` — which NixOS trusts
-  # for `system.boot.loader.kernelFile` — still reports `bzImage`. The mismatch
-  # makes the system build abort with:
-  #   The bootloader cannot find the proper kernel image.
-  #   (Expecting .../linux-zen-<ver>/bzImage)
-  # Point the loader at the file the zen kernel actually produces. The 6.x
-  # kernels (lts, 6_12, 5_15) ship `bzImage` as expected, so only override for
-  # zen. Remove once nixpkgs' linux-zen ships `bzImage` again.
-  system.boot.loader.kernelFile = lib.mkIf (cfg.kernel == "zen") "vmlinuz";
-
   # ── Limine (default, recommended) ────────────────────────────────────────
   # TODO: Limine NixOS module may require a community overlay or future nixpkgs support.
   # Track: https://github.com/NixOS/nixpkgs/pull/XXXXX

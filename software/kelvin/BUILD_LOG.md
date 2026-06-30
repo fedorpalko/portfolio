@@ -193,3 +193,18 @@ in BIOS, so QEMU runs under slow TCG software emulation. Enabling VT-x
 **Production ISO already built** at `~/kelvin-installer.iso` (interactive
 installer, all real fixes baked in) — ready to flash with
 `sudo dd if=~/kelvin-installer.iso of=/dev/sdX bs=4M oflag=sync status=progress`.
+
+### Iteration 10 — kernel image error (nixpkgs version skew), real fix
+
+- **Error:** installed system build failed: `The bootloader cannot find the
+  proper kernel image. (Expecting .../linux-zen-7.1.2/vmlinuz)`.
+- **Root cause:** version skew. The installer locks the *latest* nixos-unstable
+  (`b5aa0fb`, zen **7.1.2**), but the repo + my host tests used the older pinned
+  `e73de5b` (zen **7.0.12**). Upstream FIXED the zen kernel between those commits
+  — 7.1.2 ships `bzImage` again — so the iter-3 `kernelFile = "vmlinuz"`
+  workaround now pointed at a nonexistent file.
+- **Fix:** removed the `vmlinuz` override in `system/boot.nix` (default
+  `bzImage` is correct for the fixed kernel) AND ran `nix flake update` so the
+  repo locks the same `b5aa0fb` the installer uses — eliminating the skew so host
+  builds match real installs. Verified: Development toplevel builds cleanly
+  against `b5aa0fb`.
