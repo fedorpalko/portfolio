@@ -146,6 +146,10 @@ generate_kelvin_config_simple() {
   _copy_kelvin_modules "$kelvin_dir"
   _write_hardware_config "$kelvin_dir"
 
+  # Lock the flake LAST, once every file is in place. This must be the final
+  # write into the directory before nixos-install runs (see _write_flake_lock).
+  _write_flake_lock "$kelvin_dir"
+
   # Permissions
   chown -R "${S_USERNAME}:users" "$kelvin_dir" 2>/dev/null || true
 }
@@ -223,6 +227,10 @@ generate_kelvin_config_advanced() {
   _write_flake_nix "$kelvin_dir"
   _copy_kelvin_modules "$kelvin_dir"
   _write_hardware_config "$kelvin_dir"
+
+  # Lock the flake LAST, once every file is in place. This must be the final
+  # write into the directory before nixos-install runs (see _write_flake_lock).
+  _write_flake_lock "$kelvin_dir"
 
   chown -R "${A_USERNAME}:users" "$kelvin_dir" 2>/dev/null || true
 }
@@ -361,12 +369,39 @@ _write_flake_nix() {
         ./disko.nix
         home-manager.nixosModules.home-manager
         disko.nixosModules.disko
-        { home-manager.sharedModules = [ plasma-manager.homeManagerModules.plasma-manager ]; }
+        { home-manager.sharedModules = [ plasma-manager.homeModules.plasma-manager ]; }
       ];
     };
   };
 }
 FLKEOF
+}
+
+# ── flake.lock writer ─────────────────────────────────────────────────────────
+#
+# Why this exists:
+#   ~/.kelvin is a *non-git, writable* path flake. When `nixos-install --flake`
+#   evaluates such a flake and finds no flake.lock, nix locks the inputs and
+#   then writes flake.lock back INTO the directory mid-evaluation. That write
+#   changes the directory's contents after nix has already computed and cached
+#   its NAR hash, producing:
+#
+#     error: NAR hash mismatch in input 'path:/mnt/home/<user>/.kelvin?...'
+#
+#   By generating a complete flake.lock here — as the final write into the
+#   directory, after every other file is in place and before nixos-install runs
+#   — the lock already exists and is complete, so nixos-install reads it and
+#   never modifies the tree. The NAR hash stays stable across evaluation.
+#
+# This is intentionally the LAST thing written to $dir. Nothing else may write
+# into the directory after this point until nixos-install has finished.
+_write_flake_lock() {
+  local dir="$1"
+  # Pre-fetch and pin all inputs. Flakes are enabled in the live ISO, but pass
+  # the flags explicitly so this works regardless of nix.conf state. This also
+  # warms the store, which speeds up the subsequent nixos-install.
+  nix --extra-experimental-features "nix-command flakes" \
+    flake lock "$dir"
 }
 
 # ── Copy module tree ──────────────────────────────────────────────────────────
@@ -385,15 +420,32 @@ _copy_kelvin_modules() {
     return 0
   fi
 
+  # IMPORTANT: dereference symlinks while copying (-L). On the live ISO the
+  # source lives under /etc/kelvin, where each entry is an environment.etc
+  # symlink into /etc/static/kelvin/... -> the read-only Nix store. A plain
+  # `cp -r` of such a symlinked *directory* preserves the top-level entry as an
+  # absolute symlink (e.g. ~/.kelvin/hardware -> /etc/static/kelvin/hardware).
+  # The generated flake then resolves ./hardware/generated.nix through that link
+  # to an absolute path and nixos-install fails under pure evaluation with:
+  #   error: access to absolute path '/etc/static/kelvin/hardware/generated.nix'
+  #          is forbidden in pure evaluation mode
+  # `-L` copies the real files instead, so ~/.kelvin is self-contained and every
+  # import stays relative. (It also unblocks the hardware/generated.nix overwrite
+  # below, which otherwise would write through a symlink into the read-only store.)
   for subdir in system hardware desktop home assets; do
     [[ -d "${kelvin_source}/${subdir}" ]] && \
-      cp -r "${kelvin_source}/${subdir}" "${dir}/"
+      cp -rL "${kelvin_source}/${subdir}" "${dir}/"
   done
 
   for f in configuration.nix packages.nix user-packages.nix disko.nix; do
     [[ -f "${kelvin_source}/${f}" ]] && \
-      cp "${kelvin_source}/${f}" "${dir}/"
+      cp -L "${kelvin_source}/${f}" "${dir}/"
   done
+
+  # Store-sourced copies inherit read-only (0444) permissions. Make the tree
+  # writable so _write_hardware_config can overwrite generated.nix and so the
+  # user can edit ~/.kelvin later (`kelvin update`).
+  chmod -R u+w "$dir"
 
   # Ensure user-packages.nix exists even if copy failed
   if [[ ! -f "${dir}/user-packages.nix" ]]; then

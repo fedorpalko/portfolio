@@ -79,6 +79,34 @@
   # sourcing simple.sh / advanced.sh / detect.sh / generate.sh all resolve.
   environment.etc."kelvin-installer".source = ./installer;
 
+  # Bake the Kelvin NixOS module tree into the ISO at /etc/kelvin/. During
+  # install, generate.sh's _copy_kelvin_modules() looks for /etc/kelvin FIRST and
+  # copies these into ~/.kelvin/. Without this, the module tree never reaches the
+  # ISO, so nothing gets copied and nixos-install fails with
+  #   error: path '/mnt/nix/store/<hash>-source/configuration.nix' does not exist
+  # (configuration.nix is simply the first import the generated flake trips on;
+  # options.nix survives only because the installer generates it fresh).
+  #
+  # Every path flake.nix imports — directly (./configuration.nix, ./disko.nix)
+  # and transitively via configuration.nix (system/, hardware/, desktop/, home/,
+  # packages.nix, user-packages.nix) — must appear here AND in the copy list in
+  # _copy_kelvin_modules(). assets/ is bundled for completeness (themes, icons).
+  # options.nix and flake.nix/flake.lock are intentionally NOT baked: the
+  # installer generates those per-machine.
+  #
+  # Paths are listed individually rather than baking `./.` on purpose: the repo
+  # root contains a `result` symlink to the built ISO and flake.lock/iso.nix,
+  # none of which belong in the image.
+  environment.etc."kelvin/configuration.nix".source = ./configuration.nix;
+  environment.etc."kelvin/disko.nix".source         = ./disko.nix;
+  environment.etc."kelvin/packages.nix".source      = ./packages.nix;
+  environment.etc."kelvin/user-packages.nix".source = ./user-packages.nix;
+  environment.etc."kelvin/system".source            = ./system;
+  environment.etc."kelvin/hardware".source          = ./hardware;
+  environment.etc."kelvin/desktop".source           = ./desktop;
+  environment.etc."kelvin/home".source              = ./home;
+  environment.etc."kelvin/assets".source            = ./assets;
+
   # Enable flakes in the LIVE installer environment. Both `disko` and
   # `nixos-install --flake ...` shell out to `nix` with flake-based commands, so
   # without these experimental features the installer fails at partitioning with
