@@ -80,7 +80,7 @@ DEOF
 partition_disk_simple() {
   local disk="$1"
   _write_installer_disko_nix /tmp/kelvin-disko.nix "$disk" btrfs true
-  disko --mode destroy,format,mount /tmp/kelvin-disko.nix
+  disko --mode destroy,format,mount --yes-wipe-all-disks /tmp/kelvin-disko.nix
 }
 
 partition_disk_advanced() {
@@ -90,7 +90,7 @@ partition_disk_advanced() {
   local compression="${5:-yes}"
   [[ "$compression" == "yes" ]] && compression="true" || compression="false"
   _write_installer_disko_nix /tmp/kelvin-disko.nix "$disk" "$filesystem" "$compression"
-  disko --mode destroy,format,mount /tmp/kelvin-disko.nix
+  disko --mode destroy,format,mount --yes-wipe-all-disks /tmp/kelvin-disko.nix
 }
 
 # ── Config generation — Simple mode ──────────────────────────────────────────
