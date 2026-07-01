@@ -21,26 +21,50 @@ let cfg = config.kelvin; in
   boot.kernelModules = [ "kvm-intel" "kvm-amd" ];
 
   # ── Limine (default, recommended) ────────────────────────────────────────
-  # TODO: Limine NixOS module may require a community overlay or future nixpkgs support.
-  # Track: https://github.com/NixOS/nixpkgs/pull/XXXXX
-  # Once available, enable via:
-  #
-  #   boot.loader.limine.enable = true;
-  #   boot.loader.limine.biosSupport = true;
-  #   boot.loader.limine.maxGenerations = cfg.bootloader.generations;
-  #
-  # For now, Limine selection falls back to systemd-boot on UEFI or GRUB on BIOS.
+  # Real Limine via the nixpkgs boot.loader.limine module. UEFI only for now
+  # (Kelvin targets modern UEFI machines); BIOS installs should pick GRUB.
 
   boot.loader = lib.mkMerge [
 
-    (lib.mkIf (cfg.bootloader.type == "limine") (lib.mkMerge [
-      # TODO: replace with boot.loader.limine.* once module is available in nixpkgs
-      (lib.mkIf true {
-        systemd-boot.enable = true;
-        systemd-boot.configurationLimit = cfg.bootloader.generations;
-        efi.canTouchEfiVariables = true;
-      })
-    ]))
+    (lib.mkIf (cfg.bootloader.type == "limine") {
+      limine = {
+        enable     = true;
+        efiSupport = true;
+        # Install Limine to the removable-media path (EFI/BOOT/BOOTX64.EFI)
+        # rather than registering an NVRAM boot entry. This is the robust choice
+        # across every target Kelvin runs on — QEMU/OVMF (whose NVRAM we reset on
+        # each boot) and Macs (whose EFI variables are unreliable to write). It
+        # implies we must not touch EFI variables (see efi.canTouchEfiVariables).
+        efiInstallAsRemovable = true;
+        maxGenerations = cfg.bootloader.generations;
+
+        style = {
+          # A solid Kelvin boot background stretched to fill the screen; it
+          # supplies the backdrop colour, so the graphical terminal is left
+          # transparent on top. light = Kelvin Blue, dark = Kelvin Dark.
+          wallpapers = [
+            (if cfg.bootloader.theme == "light"
+             then ../assets/kelvin-boot-light.png
+             else ../assets/kelvin-boot-dark.png)
+          ];
+          wallpaperStyle = "stretched";
+
+          interface = {
+            branding        = "K E L V I N";
+            brandingColor   = if cfg.bootloader.theme == "light" then "2A2A2A" else "A8D8EA";
+            helpColor       = "5BA4CF";
+            helpColorBright = "A8D8EA";
+          };
+
+          graphicalTerminal = {
+            foreground       = if cfg.bootloader.theme == "light" then "2A2A2A" else "F5F5F5";
+            brightForeground = "FFFFFF";
+          };
+        };
+      };
+      # Companion to efiInstallAsRemovable: do not manage NVRAM boot entries.
+      efi.canTouchEfiVariables = false;
+    })
 
     (lib.mkIf (cfg.bootloader.type == "systemd-boot") {
       systemd-boot.enable = true;
