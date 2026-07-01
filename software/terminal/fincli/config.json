@@ -1,0 +1,13 @@
+{
+  "watchlist": [
+    "AAPL",
+    "GOOGL",
+    "AMZN",
+    "NVDA",
+    "SPCX",
+    "AMD"
+  ],
+  "refresh_interval": 15,
+  "accent_color": "red",
+  "show_market_cap": true
+}

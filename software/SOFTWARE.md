@@ -14,3 +14,8 @@ Welcome to the **Software** section. Here is a curated list of every coding proj
 ### Scripts
 
 [StratVal](scripts/stratval.py) is a simple script for validating trading strategies using the custom $G$ framework, as described [here](../finance/papers/UGRM.md).
+[RandomBot](scripts/randomBot.py) is a simplistic buy-low sell-high trading bot that uses a premade set of prices that's randomly generated, it's trivial and simple.
+
+### Other
+
+[Kelvin](kelvin/README.md) is a custom Linux distribution based on NixOS, providing an easy installer flow and a setup that I personally prefer, fused with performance tweaks to get the most out of any machine.
