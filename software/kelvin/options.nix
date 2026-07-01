@@ -222,9 +222,15 @@ let inherit (lib) mkOption types; in
       };
 
       colorScheme = mkOption {
-        type        = types.enum [ "orchis-dark" "breeze-dark" "breeze-light" "nordic" ];
+        type        = types.enum [ "orchis-dark" "orchis-light" "breeze-dark" "breeze-light" "nordic" ];
         default     = "orchis-dark";
-        description = "KDE Plasma color scheme.";
+        description = "KDE global theme + color scheme. Orchis variants pull the full Orchis look (global theme, window decorations, Plasma theme).";
+      };
+
+      displayManager = mkOption {
+        type        = types.enum [ "ly" "sddm" "gdm" "greetd" "lightdm" ];
+        default     = "ly";
+        description = "Login/display manager. ly (minimal TUI greeter) is the default.";
       };
     };
 

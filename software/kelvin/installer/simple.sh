@@ -27,8 +27,12 @@ _simple_header() {
   gum style \
     --foreground "$KELVIN_WHITE" \
     --background "$KELVIN_BLUE" \
+    --border rounded \
+    --border-foreground "$KELVIN_ICE" \
     --padding "1 4" \
+    --margin "1 0 0 0" \
     --align center \
+    --bold \
     --width 60 \
     "❄️  K E L V I N  ❄️"
   echo

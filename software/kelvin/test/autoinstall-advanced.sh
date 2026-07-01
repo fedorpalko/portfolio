@@ -69,9 +69,10 @@ export A_SWAP_SIZE="0"
 export A_CHANNEL="unstable"
 export A_KERNEL="zen"
 export A_ANANICY="yes"
-export A_ICON_PACK="papirus-dark"
-export A_FONT="inter"                  # the star of this run — verify Inter is the real UI font
-export A_COLOR_SCHEME="orchis-dark"
+export A_ICON_PACK="papirus-dark"      # advanced default
+export A_FONT="inter"
+export A_COLOR_SCHEME="orchis-dark"    # real Orchis-KDE global theme (advanced default)
+export A_DISPLAY_MANAGER="ly"          # new default greeter
 # Newline-separated use-case labels, as gum choose --no-limit would emit.
 export A_USECASES="Development"
 # Space/label string, matched by grep -qi in generate_kelvin_config_advanced.

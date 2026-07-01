@@ -1,42 +1,30 @@
 { config, pkgs, lib, ... }:
 
-let cfg = config.kelvin; in
+let
+  cfg     = config.kelvin;
+  scheme  = cfg.desktop.colorScheme;
+  isDark  = scheme == "orchis-dark" || scheme == "breeze-dark" || scheme == "nordic";
+  isOrchis = scheme == "orchis-dark" || scheme == "orchis-light";
+
+  orchis-kde = pkgs.callPackage ../assets/orchis-kde/default.nix {};
+in
 
 {
   environment.systemPackages = with pkgs; [
     papirus-icon-theme   # papirus-dark + papirus-light
     tela-icon-theme      # tela
-    bibata-cursors       # clean cursor theme
-    # breeze + oxygen are shipped with KDE — no separate package needed
+    bibata-cursors       # clean cursor theme (Bibata-Modern-Classic)
+    orchis-kde           # Orchis for KDE: color schemes, global themes, aurorae, Kvantum
+    orchis-theme         # Orchis GTK theme (so GTK apps match Plasma)
+    # breeze + oxygen ship with KDE — no separate package needed
+  ] ++ lib.optional (scheme == "nordic") pkgs.nordic;
 
-    # Color schemes
-    # orchis-dark: TODO — not yet in nixpkgs; may need an overlay or manual install
-    # nordic: available in nixpkgs as nordic
-  ] ++ lib.optional (cfg.desktop.colorScheme == "nordic") pkgs.nordic;
-
-  # Icon pack selection — applied via plasma-manager (see kde.nix TODO)
-  # cfg.desktop.iconPack maps to:
-  #   papirus-dark  → "Papirus-Dark"
-  #   papirus-light → "Papirus-Light"
-  #   breeze        → "Breeze"
-  #   oxygen        → "Oxygen"
-  #   tela          → "Tela"
-
-  # Color scheme selection — applied via plasma-manager (see kde.nix TODO)
-  # cfg.desktop.colorScheme maps to:
-  #   orchis-dark  → "OrchisDark"   (requires overlay)
-  #   breeze-dark  → "BreezeDark"
-  #   breeze-light → "BreezeLight"
-  #   nordic       → "Nordic"
-
-  # Cursor — Bibata Modern Classic at 24px
-  # TODO: set via plasma-manager once wired up
-  # programs.plasma.cursors.theme = "Bibata-Modern-Classic";
-  # programs.plasma.cursors.size  = 24;
-
-  # GTK theming — so GTK apps match Plasma
+  # GTK theming — so GTK apps match Plasma. Orchis themes are named
+  # Orchis-Dark / Orchis-Light; Breeze schemes fall back to Breeze GTK.
   programs.dconf.enable = true;
-  environment.sessionVariables.GTK_THEME = lib.mkIf
-    (cfg.desktop.colorScheme == "breeze-dark" || cfg.desktop.colorScheme == "orchis-dark")
-    "Breeze-Dark";
+  environment.sessionVariables.GTK_THEME =
+    if      scheme == "orchis-dark"  then "Orchis-Dark"
+    else if scheme == "orchis-light" then "Orchis-Light"
+    else if isDark                   then "Breeze-Dark"
+    else                                  "Breeze";
 }

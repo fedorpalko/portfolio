@@ -50,7 +50,7 @@ let cfg = config.kelvin; in
           wallpaperStyle = "stretched";
 
           interface = {
-            branding        = "K E L V I N";
+            branding        = "❄  K E L V I N  ❄";
             brandingColor   = if cfg.bootloader.theme == "light" then "2A2A2A" else "A8D8EA";
             helpColor       = "5BA4CF";
             helpColorBright = "A8D8EA";
@@ -59,6 +59,9 @@ let cfg = config.kelvin; in
           graphicalTerminal = {
             foreground       = if cfg.bootloader.theme == "light" then "2A2A2A" else "F5F5F5";
             brightForeground = "FFFFFF";
+            # A little breathing room around the menu so it doesn't hug the edge.
+            margin           = 32;
+            marginGradient   = 4;
           };
         };
       };
@@ -83,11 +86,20 @@ let cfg = config.kelvin; in
       efi.canTouchEfiVariables = true;
     })
 
+    # Snappy but not blink-and-miss-it menu (applies to whichever loader is on).
+    { timeout = lib.mkDefault 3; }
+
   ];
 
   # ── Boot splash ───────────────────────────────────────────────────────────
   boot.plymouth.enable = true;
-  # TODO: set boot.plymouth.theme to a Kelvin-branded theme once assets are finalized
+  # A calm dark boot splash under the bootloader. bgrt shows the firmware logo
+  # centered on black — clean and vendor-neutral, matches the dark Kelvin theme.
+  boot.plymouth.theme = lib.mkDefault "bgrt";
+  # Quiet the console so the splash isn't interrupted by kernel log spam.
+  boot.kernelParams = [ "quiet" "splash" "rd.udev.log_level=3" "vt.global_cursor_default=0" ];
+  boot.consoleLogLevel = 3;
+  boot.initrd.verbose = false;
 
   # ── Tmp on tmpfs ─────────────────────────────────────────────────────────
   boot.tmp.useTmpfs   = true;

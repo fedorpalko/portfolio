@@ -35,6 +35,7 @@ A_KERNEL="zen"
 A_ICON_PACK="Papirus-Dark"
 A_FONT="inter"
 A_COLOR_SCHEME="orchis-dark"
+A_DISPLAY_MANAGER="ly"
 A_SERVICES="NetworkManager PipeWire Bluetooth SSH"
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -43,8 +44,12 @@ _adv_header() {
   gum style \
     --foreground "$KELVIN_WHITE" \
     --background "$KELVIN_DARK" \
+    --border rounded \
+    --border-foreground "$KELVIN_ICE" \
     --padding "1 4" \
+    --margin "1 0 0 0" \
     --align center \
+    --bold \
     --width 60 \
     "❄️  K E L V I N  ❄️"
   echo
@@ -677,12 +682,13 @@ advanced_screen_kde() {
   esac
 
   echo
-  _adv_question "PLASMA COLOR SCHEME:"
+  _adv_question "GLOBAL THEME / COLOR SCHEME:"
   A_COLOR_SCHEME=$(gum choose \
     --item.foreground "$KELVIN_WHITE" \
     --selected.foreground "$KELVIN_WHITE" \
     --selected.background "$KELVIN_ICE" \
     "Orchis Dark    ← recommended (modern, dark, clean)" \
+    "Orchis Light   (same Orchis look, bright)" \
     "Breeze Dark" \
     "Breeze Light" \
     "Nordic" \
@@ -690,10 +696,45 @@ advanced_screen_kde() {
 
   case "$A_COLOR_SCHEME" in
     "Orchis Dark"*)  A_COLOR_SCHEME="orchis-dark" ;;
+    "Orchis Light"*) A_COLOR_SCHEME="orchis-light" ;;
     "Breeze Dark"*)  A_COLOR_SCHEME="breeze-dark" ;;
     "Breeze Light"*) A_COLOR_SCHEME="breeze-light" ;;
     "Nordic"*)       A_COLOR_SCHEME="nordic" ;;
     *)               A_COLOR_SCHEME="orchis-dark" ;;
+  esac
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Screen 13b — Display manager
+# ─────────────────────────────────────────────────────────────────────────────
+
+advanced_screen_displaymanager() {
+  clear
+  _adv_header
+  _adv_question "DISPLAY MANAGER."
+
+  gum style --foreground "$KELVIN_WHITE" --padding "0 2" \
+    "who greets you at the door. ly is default — minimal and fast."
+  echo
+
+  local choice
+  choice=$(gum choose \
+    --item.foreground "$KELVIN_WHITE" \
+    --selected.foreground "$KELVIN_WHITE" \
+    --selected.background "$KELVIN_ICE" \
+    "ly       — minimal TUI greeter  ← recommended (default)" \
+    "SDDM     — graphical, Kelvin-themed (native to Plasma)" \
+    "GDM      — GNOME's, great Wayland support (heavier)" \
+    "greetd   — modern minimal login + tuigreet TUI" \
+    "LightDM  — GTK greeter, Mint-style")
+
+  case "$choice" in
+    "ly"*)      A_DISPLAY_MANAGER="ly" ;;
+    "SDDM"*)    A_DISPLAY_MANAGER="sddm" ;;
+    "GDM"*)     A_DISPLAY_MANAGER="gdm" ;;
+    "greetd"*)  A_DISPLAY_MANAGER="greetd" ;;
+    "LightDM"*) A_DISPLAY_MANAGER="lightdm" ;;
+    *)          A_DISPLAY_MANAGER="ly" ;;
   esac
 }
 
@@ -725,7 +766,8 @@ advanced_screen_confirm() {
     "GPU:          ${A_GPU}" \
     "Icons:        ${A_ICON_PACK}" \
     "Font:         ${A_FONT}" \
-    "Theme:        ${A_COLOR_SCHEME}"
+    "Theme:        ${A_COLOR_SCHEME}" \
+    "Login:        ${A_DISPLAY_MANAGER}"
 
   echo
   gum style --foreground "$KELVIN_WHITE" --padding "0 2" \
@@ -837,7 +879,8 @@ advanced_screen_installing() {
   export A_FULL_NAME A_EMAIL A_USERNAME A_PASSWORD A_HOSTNAME A_TIMEZONE \
          A_KEYBOARD A_ARCH A_ANANICY A_USECASES A_BOOTLOADER A_BOOT_THEME \
          A_FILESYSTEM A_COMPRESSION A_SWAP A_SWAP_SIZE A_DISK A_PARTITION_SCHEME \
-         A_CPU A_GPU A_CHANNEL A_KERNEL A_ICON_PACK A_FONT A_COLOR_SCHEME A_SERVICES
+         A_CPU A_GPU A_CHANNEL A_KERNEL A_ICON_PACK A_FONT A_COLOR_SCHEME \
+         A_DISPLAY_MANAGER A_SERVICES
 
   _advanced_step "partitioning ${A_DISK}..." \
     partition_disk_advanced "$A_DISK" "$A_FILESYSTEM" "$A_SWAP" "$A_SWAP_SIZE" "$A_COMPRESSION"
@@ -879,6 +922,7 @@ run_advanced_install() {
   advanced_screen_channel
   advanced_screen_kernel
   advanced_screen_kde
+  advanced_screen_displaymanager
 
   if advanced_screen_confirm; then
     # advanced_screen_installing handles its own failures (it drops to a shell),

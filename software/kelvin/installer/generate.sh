@@ -139,8 +139,9 @@ generate_kelvin_config_simple() {
     "btrfs" "true" "zram" "0" \
     "unstable" "zen" \
     "$dev" "$gaming" "false" "$office" "$media" "$creative" "$science" "$privacy" "$server" "false" "false" "false" \
-    "papirus-dark" "inter" "orchis-dark" \
-    "true" "true" "true" "$dev" "false" "false" "false" "true"
+    "papirus-light" "inter" "orchis-light" \
+    "true" "true" "true" "$dev" "false" "false" "false" "true" \
+    "ly"
 
   _write_flake_nix "$kelvin_dir"
   _copy_kelvin_modules "$kelvin_dir"
@@ -222,7 +223,8 @@ generate_kelvin_config_advanced() {
     "$A_CHANNEL" "$A_KERNEL" \
     "$dev" "$gaming" "$gaming_tweaks" "$office" "$media" "$creative" "$science" "$privacy" "$server" "$legacy" "$virt" "$security_tools" \
     "$A_ICON_PACK" "$A_FONT" "$A_COLOR_SCHEME" \
-    "$ssh" "$cups" "$bluetooth" "$docker" "$tailscale" "$syncthing" "$fail2ban" "$ananicy"
+    "$ssh" "$cups" "$bluetooth" "$docker" "$tailscale" "$syncthing" "$fail2ban" "$ananicy" \
+    "${A_DISPLAY_MANAGER:-ly}"
 
   _write_flake_nix "$kelvin_dir"
   _copy_kelvin_modules "$kelvin_dir"
@@ -260,6 +262,7 @@ _write_settings_nix() {
   local svc_ssh="${37}"    svc_cups="${38}"   svc_bt="${39}"
   local svc_docker="${40}" svc_ts="${41}"     svc_sync="${42}"
   local svc_f2b="${43}"    svc_ananicy="${44}"
+  local display_manager="${45:-ly}"
 
   cat > "${dir}/settings.nix" <<OPTEOF
 # ~/.kelvin/settings.nix
@@ -317,9 +320,10 @@ _write_settings_nix() {
 
     # Desktop
     desktop = {
-      iconPack    = "${icon_pack}";
-      font        = "${font}";
-      colorScheme = "${color_scheme}";
+      iconPack       = "${icon_pack}";
+      font           = "${font}";
+      colorScheme    = "${color_scheme}";
+      displayManager = "${display_manager}";
     };
 
     # Services
