@@ -64,6 +64,16 @@
         ];
       }).config.system.build.isoImage;
 
+      # Same as iso-test but drives the ADVANCED-mode install path
+      # (test/autoinstall-advanced.sh). Not for end users.
+      iso-test-advanced = (nixpkgs.lib.nixosSystem {
+        inherit system;
+        modules = [
+          ./options.nix
+          ./test/iso-test-advanced.nix
+        ];
+      }).config.system.build.isoImage;
+
       kelvin       = pkgs.callPackage ./tools/kelvin/default.nix {};
       kelvin-store = pkgs.callPackage ./tools/kelvin-store/default.nix {};
     };
