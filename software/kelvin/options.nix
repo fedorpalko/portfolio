@@ -216,9 +216,9 @@ let inherit (lib) mkOption types; in
       };
 
       font = mkOption {
-        type        = types.enum [ "google-sans" "caskaydia" "ibm-plex" "noto" ];
-        default     = "google-sans";
-        description = "System UI font.";
+        type        = types.enum [ "inter" "ibm-plex" "noto" "google-sans" "caskaydia" ];
+        default     = "inter";
+        description = "System UI font. inter recommended; google-sans is a legacy alias for inter.";
       };
 
       colorScheme = mkOption {

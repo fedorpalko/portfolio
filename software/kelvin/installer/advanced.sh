@@ -33,7 +33,7 @@ A_GPU="auto"
 A_CHANNEL="unstable"
 A_KERNEL="zen"
 A_ICON_PACK="Papirus-Dark"
-A_FONT="google-sans"
+A_FONT="inter"
 A_COLOR_SCHEME="orchis-dark"
 A_SERVICES="NetworkManager PipeWire Bluetooth SSH"
 
@@ -288,8 +288,11 @@ advanced_screen_keyboard() {
     A_KEYBOARD=$(echo "$choice" | awk '{print $1}')
   fi
 
-  # Final safety net
-  [[ -z "$A_KEYBOARD" ]] && A_KEYBOARD="us"
+  # Final safety net. NB: must be an `if`, not `[[ -z … ]] && …` — under
+  # `set -e` a trailing short-circuit that evaluates false makes the function
+  # return non-zero, which aborts the whole installer the moment you pick a
+  # (non-empty) layout.
+  if [[ -z "$A_KEYBOARD" ]]; then A_KEYBOARD="us"; fi
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -662,18 +665,15 @@ advanced_screen_kde() {
     --item.foreground "$KELVIN_WHITE" \
     --selected.foreground "$KELVIN_WHITE" \
     --selected.background "$KELVIN_ICE" \
-    "Google Sans    ← recommended" \
-    "CaskaydiaCove  (monospace everywhere, terminal energy)" \
+    "Inter          ← recommended" \
     "IBM Plex Sans" \
-    "Noto Sans" \
-    "Keep default")
+    "Noto Sans")
 
   case "$A_FONT" in
-    "Google Sans"*)   A_FONT="google-sans" ;;
-    "CaskaydiaCove"*) A_FONT="caskaydia" ;;
-    "IBM Plex"*)      A_FONT="ibm-plex" ;;
-    "Noto"*)          A_FONT="noto" ;;
-    *)                A_FONT="google-sans" ;;
+    "Inter"*)     A_FONT="inter" ;;
+    "IBM Plex"*)  A_FONT="ibm-plex" ;;
+    "Noto"*)      A_FONT="noto" ;;
+    *)            A_FONT="inter" ;;
   esac
 
   echo

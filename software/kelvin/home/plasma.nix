@@ -14,6 +14,17 @@ let
     "oxygen"        = "Oxygen";
     "tela"          = "Tela";
   };
+  # Maps the kelvin font choice to the actual family name KDE should use for its
+  # UI. Kept in sync with the fontconfig sansSerif families in desktop/fonts.nix.
+  # google-sans is a legacy alias for Inter.
+  fontFamilyMap = {
+    "inter"        = "Inter";
+    "google-sans"  = "Inter";
+    "ibm-plex"     = "IBM Plex Sans";
+    "noto"         = "Noto Sans";
+    "caskaydia"    = "CaskaydiaCove Nerd Font";
+  };
+  uiFont = fontFamilyMap.${kelvinCfg.desktop.font} or "Inter";
 in
 
 {
@@ -27,6 +38,20 @@ in
         theme = "Breeze";
         size  = 24;
       };
+    };
+
+    # System UI fonts. Without this block Plasma falls back to its built-in
+    # default (Noto Sans) regardless of the fontconfig default, so the chosen
+    # Kelvin font never actually showed up in the desktop. General/menu/toolbar/
+    # title/small use the chosen sans; fixed-width always stays on the mono nerd
+    # font so terminals and code stay monospaced.
+    fonts = {
+      general     = { family = uiFont; pointSize = 10; };
+      menu        = { family = uiFont; pointSize = 10; };
+      toolbar     = { family = uiFont; pointSize = 10; };
+      windowTitle = { family = uiFont; pointSize = 10; };
+      small       = { family = uiFont; pointSize = 8; };
+      fixedWidth  = { family = "CaskaydiaCove Nerd Font Mono"; pointSize = 10; };
     };
 
     kwin = {

@@ -28,7 +28,8 @@ let cfg = config.kelvin; in
 
       defaultFonts = {
         sansSerif =
-          if      cfg.desktop.font == "google-sans" then [ "Inter" "Noto Sans" ]
+          if      cfg.desktop.font == "inter"       then [ "Inter" "Noto Sans" ]
+          else if cfg.desktop.font == "google-sans" then [ "Inter" "Noto Sans" ]
           else if cfg.desktop.font == "caskaydia"   then [ "CaskaydiaCove Nerd Font" "Noto Sans" ]
           else if cfg.desktop.font == "ibm-plex"    then [ "IBM Plex Sans" "Noto Sans" ]
           else                                           [ "Noto Sans" ];

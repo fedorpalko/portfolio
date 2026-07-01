@@ -139,7 +139,7 @@ generate_kelvin_config_simple() {
     "btrfs" "true" "zram" "0" \
     "unstable" "zen" \
     "$dev" "$gaming" "false" "$office" "$media" "$creative" "$science" "$privacy" "$server" "false" "false" "false" \
-    "papirus-dark" "google-sans" "orchis-dark" \
+    "papirus-dark" "inter" "orchis-dark" \
     "true" "true" "true" "$dev" "false" "false" "false" "true"
 
   _write_flake_nix "$kelvin_dir"
